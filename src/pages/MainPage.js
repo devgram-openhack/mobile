@@ -16,7 +16,7 @@ function MainPage({ navigation }) {
       <ImageBackground source={matrix} style={mainPageStyle.background}>
         <HeaderComponent navigation={navigation} />
         <PostListComponent isMainList={true} navigation={navigation} />
-        <FooterComponent />
+        <FooterComponent navigation={navigation} />
       </ImageBackground>
     </SafeAreaView>
   );
