@@ -4,7 +4,11 @@ import { YellowBox } from 'react-native';
 import { Routes } from './routes';
 
 YellowBox.ignoreWarnings([
-  'Unrecognized WebSocket'
+  'Unrecognized WebSocket',
+  'componentWillMount is deprecated',
+  'componentWillUpdate is deprecated',
+  'componentWillReceiveProps is deprecated',
+  'ViewPagerAndroid has been extracted',
 ]);
 
 /**
