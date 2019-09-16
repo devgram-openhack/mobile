@@ -1,13 +1,18 @@
-import {
-  createAppContainer,
-  createSwitchNavigator
-} from 'react-navigation';
+import { createAppContainer } from 'react-navigation';
+import { createDrawerNavigator } from 'react-navigation-drawer';
+import { createStackNavigator }  from 'react-navigation-stack';
 
-import { Main } from './pages/Main';
+import { MainPage } from './pages/MainPage';
+import { PostPage } from './pages/PostPage';
 
 const Routes = createAppContainer(
-  createSwitchNavigator({
-    Main
+  createDrawerNavigator({
+    Home: createStackNavigator({
+      MainPage,
+      PostPage
+    }, {
+      headerMode: 'none'
+    })
   })
 );
 
