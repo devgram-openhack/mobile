@@ -47,6 +47,7 @@ const postComponentStyle = StyleSheet.create({
 
   image: {
     height: 180,
+    marginTop: 8,
     resizeMode: 'contain'
   },
 
@@ -116,18 +117,29 @@ const postComponentStyle = StyleSheet.create({
     color: '#ccc'
   },
 
-  newCommentContainer: {
+  newCommentForm: {
     alignItems: 'center'
+  },
+
+  newCommentField: {
+    marginBottom: 16,
+    width: 300
   },
 
   newCommentInput: {
     backgroundColor: '#555',
     borderRadius: 5,
     marginBottom: 8,
-    width: 300
+    width: '100%'
   },
 
-  newCommentButton: {
+  newCommentError: {
+    color: '#c22f31',
+    fontSize: 16,
+    fontStyle: 'italic'
+  },
+
+  newCommentSubmitButton: {
     backgroundColor: '#333',
     borderRadius: 5,
     height: 40,
@@ -135,7 +147,7 @@ const postComponentStyle = StyleSheet.create({
     width: 200
   },
 
-  newCommentButtonText: {
+  newCommentSubmitButtonText: {
     color: '#31c32e',
     fontSize: 16,
     fontWeight: 'bold',

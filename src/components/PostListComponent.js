@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FlatList, RefreshControl, ScrollView, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import PropTypes from 'prop-types';
@@ -72,58 +72,112 @@ const FAKE_POSTS = [
     likes: 155,
     dislikes: 3,
     comments: []
+  },
+  {
+    id: '2',
+    authorAvatar: 'https://avatars0.githubusercontent.com/u/25509361?s=460',
+    authorName: 'Carl Grimes',
+    authorUsername: 'carl',
+    authorRole: 'Designer',
+    authorTeam: 'Bookcademers',
+    title: 'Idea: Bookcademy',
+    images: [],
+    text: 'Hello everyone, we have an idea to turn non-fiction books into a fun, useful and practical way to learn. No images yet, but what do you think?',
+    likes: 30,
+    dislikes: 122,
+    comments: []
   }
 ];
 
-function PostListComponent({ initialPosts, isMainList, navigation }) {
-  const [postList, setPostList] = useState({ isRefreshing: false, posts: initialPosts || [] });
+function PostListComponent({ authorUsername, initialPosts, isMainList, navigation }) {
+  const [postList, setPostList] = useState({
+    isLastPage: true,
+    isRefreshing: false,
+    posts: initialPosts || []
+  });
+
+  useEffect(() => {
+    if (authorUsername) {
+      setPostList({
+        ...postList,
+        posts: FAKE_POSTS.filter(post => post.authorUsername === authorUsername)
+      });
+    }
+  }, []);
 
   // TODO: Implement API call
   async function refreshPosts() {
-    setPostList({ isRefreshing: true, posts: [] });
+    setPostList({
+      ...postList,
+      isRefreshing: true
+    });
 
     await utils.timeout(1);
 
-    setPostList({ isRefreshing: false, posts: FAKE_POSTS });
+    setPostList({
+      isLastPage: false,
+      isRefreshing: false,
+      posts: authorUsername ? FAKE_POSTS.filter(post => post.authorUsername === authorUsername) : FAKE_POSTS
+    });
+  }
+
+  // TODO: Implement API call
+  async function loadMore() {
+    if (!postList.isLastPage) {
+      setPostList({
+        ...postList,
+        isLastPage: true,
+        posts: [...postList.posts, Object.assign({}, FAKE_POSTS[0], { id: '3' })]
+      });
+    }
   }
 
   return (
-    <ScrollView
-      contentContainerStyle={postListComponentStyle.container}
-      refreshControl={
-        isMainList
-          ? (
-            <RefreshControl onRefresh={refreshPosts} refreshing={postList.isRefreshing} />
-          )
-          : (
-            null
-          )
-      }
-    >
-      {
-        postList.posts.length > 0
-          ? (
-            <FlatList
-              data={postList.posts}
-              keyExtractor={item => item.id}
-              renderItem={({ item }) => (
-                <PostComponent details={item} isMainList={isMainList} navigation={navigation} />
-              )}
-            />
-          )
-          : (
-            <View style={postListComponentStyle.emptyContainer}>
-              <Icon name='highlight-off' style={postListComponentStyle.emptyContainerIcon} />
+    postList.posts.length > 0
+      ? (
+        <FlatList
+          contentContainerStyle={[postListComponentStyle.container, postListComponentStyle.containerBackground]}
+          data={postList.posts}
+          keyExtractor={item => item.id}
+          onRefresh={isMainList ? refreshPosts : undefined}
+          onEndReached={loadMore}
+          onEndReachedThreshold={1}
+          refreshing={isMainList ? postList.isRefreshing : undefined}
+          renderItem={({ item }) => (
+            <PostComponent details={item} isMainList={isMainList} isProfilePage={!!authorUsername} navigation={navigation} />
+          )}
+        />
+      )
+      : (
+        <ScrollView
+          contentContainerStyle={[postListComponentStyle.container, postListComponentStyle.emptyContainerBackground]}
+          refreshControl={
+            isMainList
+              ? (
+                <RefreshControl onRefresh={refreshPosts} refreshing={postList.isRefreshing} />
+              )
+              : (
+                null
+              )
+          }
+        >
+          <View style={postListComponentStyle.emptyContainer}>
+            <Icon name='highlight-off' style={postListComponentStyle.emptyContainerIcon} />
 
-              <Text style={postListComponentStyle.emptyContainerText}>No posts to show. Scroll up to refresh the page or press the button at the bottom of the screen to create a new post.</Text>
-            </View>
-          )
-      }
-    </ScrollView>
+            <Text style={postListComponentStyle.emptyContainerText}>
+              {authorUsername
+                ? 'This user has no posts. Scroll up to refresh the page.'
+                : 'No posts to show. Scroll up to refresh the page or press the button at the bottom of the screen to create a new post.'
+              }
+            </Text>
+          </View>
+        </ScrollView>
+      )
   );
 }
 
 PostListComponent.propTypes = {
+  authorUsername: PropTypes.string,
   initialPosts: PropTypes.array,
   isMainList: PropTypes.bool,
   navigation: PropTypes.object.isRequired

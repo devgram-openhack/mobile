@@ -16,11 +16,16 @@ function HeaderComponent({ navigation }) {
         <Icon name="menu" style={headerComponentStyle.menuIcon} />
       </TouchableOpacity>
 
-      <Text style={headerComponentStyle.title}>DEVGRAM</Text>
+      <TouchableOpacity
+        onLongPress={() => Toast.show('Go to main page')}
+        onPress={() => navigation.navigate('MainPage')}
+      >
+        <Text style={headerComponentStyle.title}>DEVGRAM</Text>
+      </TouchableOpacity>
 
       <TouchableOpacity
         onLongPress={() => Toast.show('Manage account')}
-        onPress={() => Toast.show('Not working yet')} // TODO: Implement account management page
+        onPress={() => navigation.navigate('ProfilePage')}
       >
         <Icon name="account-circle" style={headerComponentStyle.accountIcon} />
       </TouchableOpacity>

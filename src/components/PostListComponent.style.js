@@ -6,9 +6,16 @@ const postListComponentStyle = StyleSheet.create({
     padding: 16
   },
 
+  containerBackground: {
+    backgroundColor: 'rgba(0, 0, 0, 0.75)'
+  },
+
+  emptyContainerBackground: {
+    backgroundColor: 'rgba(0, 0, 0, 0.8)'
+  },
+
   emptyContainer: {
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
     flex: 1,
     justifyContent: 'center'
   },
