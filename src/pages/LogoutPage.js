@@ -16,7 +16,7 @@ import { Page } from '../components/Page';
 import { LogoHeader } from '../components/LogoHeader';
 
 import { colors } from '../styles/colors';
-import { logoutPageStyle } from '../styles/LogoutPage.style';
+import { commonStyle } from '../styles/Common.style';
 
 async function handleLogout(navigation, formikActions) {
   const session = JSON.parse((await AsyncStorage.getItem('session')) || '{}');
@@ -49,11 +49,11 @@ function LogoutPage({ navigation }) {
             isSubmitting,
             status,
           }) => (
-            <View style={logoutPageStyle.container}>
+            <View style={commonStyle.containerCentered}>
               {
                 !!status && (
-                  <View style={logoutPageStyle.field}>
-                    <Text style={logoutPageStyle.fieldError}>{status}</Text>
+                  <View style={commonStyle.formField}>
+                    <Text style={commonStyle.formError}>{status}</Text>
                   </View>
                 )
               }
@@ -65,21 +65,21 @@ function LogoutPage({ navigation }) {
                     size={moderateScale(40)}
                   />
                 ) : (
-                  <View style={logoutPageStyle.field}>
-                    <Text style={logoutPageStyle.fieldLabel}>Are you sure you want to log out?</Text>
+                  <View style={commonStyle.formField}>
+                    <Text style={commonStyle.formFieldLabel}>Are you sure you want to log out?</Text>
 
                     <TouchableOpacity
                       onPress={handleSubmit}
-                      style={logoutPageStyle.button}
+                      style={commonStyle.buttonLarge}
                     >
-                      <Text style={logoutPageStyle.buttonText}>YES</Text>
+                      <Text style={commonStyle.buttonText}>YES</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
                       onPress={() => navigation.goBack()}
-                      style={logoutPageStyle.button}
+                      style={commonStyle.buttonLarge}
                     >
-                      <Text style={logoutPageStyle.buttonText}>NO</Text>
+                      <Text style={commonStyle.buttonText}>NO</Text>
                     </TouchableOpacity>
                   </View>
                 )

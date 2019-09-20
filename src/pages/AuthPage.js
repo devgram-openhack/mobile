@@ -9,26 +9,26 @@ import PropTypes from 'prop-types';
 import { Page } from '../components/Page';
 import { LogoHeader } from '../components/LogoHeader';
 
-import { authPageStyle } from '../styles/AuthPage.style';
+import { commonStyle } from '../styles/Common.style';
 
 function AuthPage({ navigation }) {
   return (
     <Page>
       <LogoHeader />
 
-      <View style={authPageStyle.container}>
+      <View style={commonStyle.containerCentered}>
         <TouchableOpacity
           onPress={() => navigation.navigate('LoginPage')}
-          style={authPageStyle.button}
+          style={commonStyle.buttonLarge}
         >
-          <Text style={authPageStyle.buttonText}>LOG IN</Text>
+          <Text style={commonStyle.buttonText}>LOG IN</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           onPress={() => navigation.navigate('RegisterPage')}
-          style={authPageStyle.button}
+          style={commonStyle.buttonLarge}
         >
-          <Text style={authPageStyle.buttonText}>REGISTER</Text>
+          <Text style={commonStyle.buttonText}>REGISTER</Text>
         </TouchableOpacity>
       </View>
     </Page>

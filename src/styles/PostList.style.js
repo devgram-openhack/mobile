@@ -4,19 +4,6 @@ import { moderateScale } from 'react-native-size-matters';
 import { colors } from './colors';
 
 const postListStyle = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    flexGrow: 1,
-    padding: moderateScale(16),
-    paddingBottom: moderateScale(64),
-  },
-
-  emptyContainer: {
-    alignItems: 'center',
-    flex: 1,
-    justifyContent: 'center',
-  },
-
   emptyContainerIcon: {
     color: colors.main,
     fontSize: moderateScale(40),

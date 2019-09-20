@@ -13,7 +13,7 @@ import { Page } from '../components/Page';
 import { LogoHeader } from '../components/LogoHeader';
 
 import { colors } from '../styles/colors';
-import { landingPageStyle } from '../styles/LandingPage.style';
+import { commonStyle } from '../styles/Common.style';
 
 async function checkLoggedIn(navigation) {
   const session = JSON.parse((await AsyncStorage.getItem('session')) || '{}');
@@ -32,7 +32,7 @@ function LandingPage({ navigation }) {
     <Page>
       <LogoHeader />
 
-      <View style={landingPageStyle.container}>
+      <View style={commonStyle.containerCentered}>
         <ActivityIndicator
           color={colors.main}
           size={moderateScale(40)}

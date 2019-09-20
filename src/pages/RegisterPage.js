@@ -22,6 +22,7 @@ import { Page } from '../components/Page';
 import { LogoHeader } from '../components/LogoHeader';
 
 import { colors } from '../styles/colors';
+import { commonStyle } from '../styles/Common.style';
 import { registerPageStyle } from '../styles/RegisterPage.style';
 
 async function handleRegister(navigation, session, user, values, formikActions) {
@@ -124,9 +125,9 @@ function RegisterPage({ navigation }) {
             status,
             values
           }) => (
-            <ScrollView contentContainerStyle={registerPageStyle.container}>
-              <View style={registerPageStyle.field}>
-                <Text style={registerPageStyle.fieldLabel}>Avatar</Text>
+            <ScrollView contentContainerStyle={commonStyle.containerScrollable}>
+              <View style={commonStyle.formField}>
+                <Text style={commonStyle.formFieldLabel}>Avatar</Text>
 
                 <View style={registerPageStyle.fieldAvatar}>
                   {
@@ -139,153 +140,153 @@ function RegisterPage({ navigation }) {
 
                   <TouchableOpacity
                     onPress={() => selectAvatar(setFieldError, setFieldValue)}
-                    style={registerPageStyle.fieldAvatarButton}
+                    style={commonStyle.buttonSmall}
                   >
-                    <Text style={registerPageStyle.fieldAvatarButtonText}>SELECT</Text>
+                    <Text style={commonStyle.buttonText}>SELECT</Text>
                   </TouchableOpacity>
                 </View>
 
                 {
                   errors.avatar && (
-                    <Text style={registerPageStyle.fieldError}>{errors.avatar}</Text>
+                    <Text style={commonStyle.formFieldError}>{errors.avatar}</Text>
                   )
                 }
               </View>
 
-              <View style={registerPageStyle.field}>
-                <Text style={registerPageStyle.fieldLabel}>Username (*)</Text>
+              <View style={commonStyle.formField}>
+                <Text style={commonStyle.formFieldLabel}>Username (*)</Text>
 
                 <TextInput
                   autoCompleteType='off'
                   onChangeText={handleChange('username')}
                   placeholder='johndoe'
-                  style={registerPageStyle.fieldInput}
+                  style={commonStyle.formFieldInput}
                   value={values.username}
                 />
 
                 {
                   errors.username && (
-                    <Text style={registerPageStyle.fieldError}>{errors.username}</Text>
+                    <Text style={commonStyle.formFieldError}>{errors.username}</Text>
                   )
                 }
               </View>
 
-              <View style={registerPageStyle.field}>
-                <Text style={registerPageStyle.fieldLabel}>Name (*)</Text>
+              <View style={commonStyle.formField}>
+                <Text style={commonStyle.formFieldLabel}>Name (*)</Text>
 
                 <TextInput
                   autoCompleteType='off'
                   onChangeText={handleChange('name')}
                   placeholder='John Doe'
-                  style={registerPageStyle.fieldInput}
+                  style={commonStyle.formFieldInput}
                   value={values.name}
                 />
 
                 {
                   errors.name && (
-                    <Text style={registerPageStyle.fieldError}>{errors.name}</Text>
+                    <Text style={commonStyle.formFieldError}>{errors.name}</Text>
                   )
                 }
               </View>
 
-              <View style={registerPageStyle.field}>
-                <Text style={registerPageStyle.fieldLabel}>Specialization (*)</Text>
+              <View style={commonStyle.formField}>
+                <Text style={commonStyle.formFieldLabel}>Specialization (*)</Text>
 
                 <TextInput
                   autoCompleteType='off'
                   onChangeText={handleChange('specialization')}
                   placeholder='Front-end Developer'
-                  style={registerPageStyle.fieldInput}
+                  style={commonStyle.formFieldInput}
                   value={values.specialization}
                 />
 
                 {
                   errors.specialization && (
-                    <Text style={registerPageStyle.fieldError}>{errors.specialization}</Text>
+                    <Text style={commonStyle.formFieldError}>{errors.specialization}</Text>
                   )
                 }
               </View>
 
-              <View style={registerPageStyle.field}>
-                <Text style={registerPageStyle.fieldLabel}>Description</Text>
+              <View style={commonStyle.formField}>
+                <Text style={commonStyle.formFieldLabel}>Description</Text>
 
                 <TextInput
                   autoCompleteType='off'
                   numberOfLines={5}
                   onChangeText={handleChange('description')}
                   placeholder='Tell us a little about yourself...'
-                  style={registerPageStyle.fieldInput}
+                  style={commonStyle.formFieldInput}
                   value={values.description}
                 />
 
                 {
                   errors.description && (
-                    <Text style={registerPageStyle.fieldError}>{errors.description}</Text>
+                    <Text style={commonStyle.formFieldError}>{errors.description}</Text>
                   )
                 }
               </View>
 
-              <View style={registerPageStyle.field}>
-                <Text style={registerPageStyle.fieldLabel}>Email (*)</Text>
+              <View style={commonStyle.formField}>
+                <Text style={commonStyle.formFieldLabel}>Email (*)</Text>
 
                 <TextInput
                   autoCompleteType='email'
                   keyboardType='email-address'
                   onChangeText={handleChange('email')}
                   placeholder='johndoe@example.com'
-                  style={registerPageStyle.fieldInput}
+                  style={commonStyle.formFieldInput}
                   value={values.email}
                 />
 
                 {
                   errors.email && (
-                    <Text style={registerPageStyle.fieldError}>{errors.email}</Text>
+                    <Text style={commonStyle.formFieldError}>{errors.email}</Text>
                   )
                 }
               </View>
 
-              <View style={registerPageStyle.field}>
-                <Text style={registerPageStyle.fieldLabel}>Password (*)</Text>
+              <View style={commonStyle.formField}>
+                <Text style={commonStyle.formFieldLabel}>Password (*)</Text>
 
                 <TextInput
                   autoCompleteType='off'
                   onChangeText={handleChange('password')}
                   placeholder='********'
                   secureTextEntry={true}
-                  style={registerPageStyle.fieldInput}
+                  style={commonStyle.formFieldInput}
                   value={values.password}
                 />
 
                 {
                   errors.password && (
-                    <Text style={registerPageStyle.fieldError}>{errors.password}</Text>
+                    <Text style={commonStyle.formFieldError}>{errors.password}</Text>
                   )
                 }
               </View>
 
-              <View style={registerPageStyle.field}>
-                <Text style={registerPageStyle.fieldLabel}>Confirm Password (*)</Text>
+              <View style={commonStyle.formField}>
+                <Text style={commonStyle.formFieldLabel}>Confirm Password (*)</Text>
 
                 <TextInput
                   autoCompleteType='off'
                   onChangeText={handleChange('confirmPassword')}
                   placeholder='********'
                   secureTextEntry={true}
-                  style={registerPageStyle.fieldInput}
+                  style={commonStyle.formFieldInput}
                   value={values.confirmPassword}
                 />
 
                 {
                   errors.confirmPassword && (
-                    <Text style={registerPageStyle.fieldError}>{errors.confirmPassword}</Text>
+                    <Text style={commonStyle.formFieldError}>{errors.confirmPassword}</Text>
                   )
                 }
               </View>
 
               {
                 !!status && (
-                  <View style={registerPageStyle.field}>
-                    <Text style={registerPageStyle.fieldError}>{status}</Text>
+                  <View style={commonStyle.formField}>
+                    <Text style={commonStyle.formFieldError}>{status}</Text>
                   </View>
                 )
               }
@@ -299,9 +300,9 @@ function RegisterPage({ navigation }) {
                 ) : (
                   <TouchableOpacity
                     onPress={handleSubmit}
-                    style={registerPageStyle.submitButton}
+                    style={commonStyle.buttonLarge}
                   >
-                    <Text style={registerPageStyle.submitButtonText}>
+                    <Text style={commonStyle.buttonText}>
                       {
                         user.username ? (
                           'EDIT'
