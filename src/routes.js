@@ -1,21 +1,41 @@
-import { createAppContainer } from 'react-navigation';
+import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createDrawerNavigator } from 'react-navigation-drawer';
 import { createStackNavigator }  from 'react-navigation-stack';
 
+import { LandingPage } from './pages/LandingPage';
+import { AuthPage } from './pages/AuthPage';
+import { LoginPage } from './pages/LoginPage';
+import { RegisterPage } from './pages/RegisterPage';
 import { MainPage } from './pages/MainPage';
+import { ProfilePage } from './pages/ProfilePage';
 import { PostPage } from './pages/PostPage';
 import { NewPostPage } from './pages/NewPostPage';
-import { ProfilePage } from './pages/ProfilePage';
+import { LogoutPage } from './pages/LogoutPage';
+
+import { colors } from './styles/colors';
 
 const Routes = createAppContainer(
-  createDrawerNavigator({
-    Home: createStackNavigator({
-      MainPage,
-      PostPage,
-      NewPostPage,
-      ProfilePage
+  createSwitchNavigator({
+    LandingPage,
+    Auth: createStackNavigator({
+      AuthPage,
+      LoginPage,
+      RegisterPage,
     }, {
-      headerMode: 'none'
+      headerMode: 'none',
+    }),
+    App: createDrawerNavigator({
+      Home: createStackNavigator({
+        MainPage,
+        ProfilePage,
+        PostPage,
+        NewPostPage,
+      }, {
+        headerMode: 'none',
+      }),
+      Logout: LogoutPage,
+    }, {
+      drawerBackgroundColor: colors.input,
     })
   })
 );
