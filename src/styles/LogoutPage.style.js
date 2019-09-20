@@ -13,7 +13,7 @@ const logoutPageStyle = StyleSheet.create({
 
   field: {
     marginBottom: moderateScale(16),
-    maxWidth: moderateScale(300),
+    maxWidth: moderateScale(332),
     width: '100%',
   },
 

@@ -7,6 +7,7 @@ const postStyle = StyleSheet.create({
   container: {
     backgroundColor: colors.card,
     marginBottom: moderateScale(16),
+    width: moderateScale(332),
   },
 
   authorContainer: {
@@ -20,6 +21,14 @@ const postStyle = StyleSheet.create({
     height: moderateScale(40),
     marginRight: moderateScale(8),
     width: moderateScale(40),
+  },
+
+  authorAvatarIcon: {
+    backgroundColor: colors.input,
+    borderRadius: moderateScale(20),
+    color: colors.bar,
+    fontSize: moderateScale(40),
+    marginRight: moderateScale(8),
   },
 
   authorName: {
@@ -68,6 +77,10 @@ const postStyle = StyleSheet.create({
     flexDirection: 'row',
   },
 
+  actionContainerRight: {
+    flexDirection: 'row',
+  },
+
   likeAction: {
     marginRight: moderateScale(24),
   },
@@ -96,8 +109,13 @@ const postStyle = StyleSheet.create({
     opacity: 0.5,
   },
 
-  focusAction: {
-    opacity: 1,
+  editPostAction: {
+    marginRight: moderateScale(24),
+  },
+
+  editPostActionIcon: {
+    color: colors.text,
+    fontSize: moderateScale(24),
   },
 
   commentActionIcon: {
@@ -110,13 +128,17 @@ const postStyle = StyleSheet.create({
     textAlign: 'center',
   },
 
+  focusAction: {
+    opacity: 1,
+  },
+
   newCommentContainer: {
     alignItems: 'center',
   },
 
   newCommentField: {
     marginBottom: moderateScale(16),
-    maxWidth: moderateScale(300),
+    maxWidth: moderateScale(332),
     width: '100%',
   },
 

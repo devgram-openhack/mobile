@@ -66,23 +66,44 @@ function ProfilePage({ navigation }) {
         ) : (
           <View style={profilePageStyle.container}>
             <View style={profilePageStyle.userContainer}>
-              <Image source={{uri: state.user.avatar }} style={profilePageStyle.userAvatar}/>
+              {
+                state.user.avatar ? (
+                  <Image source={{ uri: state.user.avatar }} style={profilePageStyle.userAvatar}/>
+                ) : (
+                  <Icon name='account-circle' style={profilePageStyle.userAvatarIcon} />
+                )
+              }
 
               <View style={profilePageStyle.userContainerRight}>
                 <View>
                   <Text style={profilePageStyle.userName}>{`${state.user.name} (@${state.user.username})`}</Text>
 
-                  <Text style={profilePageStyle.userRole}>{state.user.role}</Text>
+                  <Text style={profilePageStyle.userRole}>{state.user.specialization}</Text>
                 </View>
 
-                <TouchableOpacity
-                  onPress={() => setState({
-                    ...state,
-                    isModalVisible: true,
-                  })}
-                >
-                  <Icon name='note' style={profilePageStyle.userDescriptionIcon} />
-                </TouchableOpacity>
+                <View style={profilePageStyle.userActions}>
+                  {
+                    username === session.username && (
+                      <TouchableOpacity
+                        onPress={() => navigation.navigate('RegisterPage', {
+                          session,
+                          user: state.user
+                        })}
+                      >
+                        <Icon name='edit' style={profilePageStyle.userEditIcon} />
+                      </TouchableOpacity>
+                    )
+                  }
+
+                  <TouchableOpacity
+                    onPress={() => setState({
+                      ...state,
+                      isModalVisible: true,
+                    })}
+                  >
+                    <Icon name='note' style={profilePageStyle.userDescriptionIcon} />
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
 

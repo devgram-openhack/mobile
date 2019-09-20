@@ -82,7 +82,7 @@ function PostList({ navigation, params }) {
         <FlatList
           contentContainerStyle={postListStyle.container}
           data={state.posts}
-          keyExtractor={item => item.id}
+          keyExtractor={item => `${item.id}_${item.modifiedTimestamp}`}
           onRefresh={() => refreshPage(params, session, state, setState)}
           onEndReached={() => loadPosts(params, session, state, setState)}
           onEndReachedThreshold={0.5}

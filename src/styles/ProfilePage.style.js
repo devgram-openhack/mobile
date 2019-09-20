@@ -28,10 +28,22 @@ const profilePageStyle = StyleSheet.create({
     width: moderateScale(40),
   },
 
+  userAvatarIcon: {
+    backgroundColor: colors.input,
+    borderRadius: moderateScale(20),
+    color: colors.bar,
+    fontSize: moderateScale(40),
+    marginRight: moderateScale(8),
+  },
+
   userContainerRight: {
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+
+  userActions: {
+    flexDirection: 'row',
   },
 
   userName: {
@@ -42,6 +54,12 @@ const profilePageStyle = StyleSheet.create({
   userRole: {
     color: colors.main,
     fontStyle: 'italic',
+  },
+
+  userEditIcon: {
+    color: colors.text,
+    fontSize: moderateScale(40),
+    marginRight: moderateScale(8),
   },
 
   userDescriptionIcon: {

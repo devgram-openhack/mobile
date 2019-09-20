@@ -21,7 +21,9 @@ import { logoutPageStyle } from '../styles/LogoutPage.style';
 async function handleLogout(navigation, formikActions) {
   const session = JSON.parse((await AsyncStorage.getItem('session')) || '{}');
 
-  const response = await api.post('/logout', session);
+  const response = await api.post('/logout', null, {
+    'Authorization': `Bearer ${session.token}`,
+  });
 
   if (response.data.success) {
     await AsyncStorage.removeItem('session');

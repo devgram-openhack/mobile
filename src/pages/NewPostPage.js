@@ -23,10 +23,12 @@ import { LogoHeader } from '../components/LogoHeader';
 import { colors } from '../styles/colors';
 import { newPostPageStyle } from '../styles/NewPostPage.style';
 
-async function handleNewPost(navigation, session, values, formikActions) {
+async function handleNewPost(navigation, session, post, values, formikActions) {
   Keyboard.dismiss();
 
-  const response = await api.post('/posts', values, {
+  const [method, url] = post.id ? ['patch', `/post/${post.id}`] : ['post', '/posts'];
+
+  const response = await api[method](url, values, {
     'Authorization': `Bearer ${session.token}`,
   });
 
@@ -65,6 +67,7 @@ function addImage(images, setFieldError, setFieldValue) {
 }
 
 function NewPostPage({ navigation }) {
+  const post = navigation.getParam('post') || {};
   const session = navigation.getParam('session');
 
   return (
@@ -73,11 +76,11 @@ function NewPostPage({ navigation }) {
 
       <Formik
         initialValues={{
-          title: '',
-          images: [],
-          description: '',
+          title: post.title || '',
+          images: (post.images || []).map(uri => ({ data: '', uri })),
+          description: post.description || '',
         }}
-        onSubmit={(values, formikActions) => handleNewPost(navigation, session, values, formikActions)}
+        onSubmit={(values, formikActions) => handleNewPost(navigation, session, post, values, formikActions)}
         validate={validateNewPostForm}
         validateOnChange={false}
       >
@@ -177,7 +180,15 @@ function NewPostPage({ navigation }) {
                     onPress={handleSubmit}
                     style={newPostPageStyle.submitButton}
                   >
-                    <Text style={newPostPageStyle.submitButtonText}>PUBLISH</Text>
+                    <Text style={newPostPageStyle.submitButtonText}>
+                      {
+                        post.id ? (
+                          'EDIT'
+                        ) : (
+                          'PUBLISH'
+                        )
+                      }
+                    </Text>
                   </TouchableOpacity>
                 )
               }

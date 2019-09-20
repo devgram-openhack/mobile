@@ -24,10 +24,14 @@ import { LogoHeader } from '../components/LogoHeader';
 import { colors } from '../styles/colors';
 import { registerPageStyle } from '../styles/RegisterPage.style';
 
-async function handleRegister(navigation, values, formikActions) {
+async function handleRegister(navigation, session, user, values, formikActions) {
   Keyboard.dismiss();
 
-  const response = await api.post('/register', values);
+  const [method, url] = user.username ? ['patch', `/user/${user.username}`] : ['post', '/register'];
+
+  const response = await api[method](url, values, session ? {
+    'Authorization': `Bearer ${session.token}`
+  } : null);
 
   if (response.data.success) {
     const { session } = response.data;
@@ -84,6 +88,9 @@ function selectAvatar(setFieldError, setFieldValue) {
 }
 
 function RegisterPage({ navigation }) {
+  const session = navigation.getParam('session');
+  const user = navigation.getParam('user') || {};
+
   return (
     <Page>
       <LogoHeader />
@@ -92,17 +99,17 @@ function RegisterPage({ navigation }) {
         initialValues={{
           avatar: {
             data: '',
-            uri: '',
+            uri: user.avatar || '',
           },
-          username: '',
-          name: '',
-          specialization: '',
-          description: '',
-          email: '',
-          password: '',
-          confirmPassword: '',
+          username: user.username || '',
+          name: user.name || '',
+          specialization: user.specialization || '',
+          description: user.description || '',
+          email: user.email || '',
+          password: user.password || '',
+          confirmPassword: user.confirmPassword || '',
         }}
-        onSubmit={(values, formikActions) => handleRegister(navigation, values, formikActions)}
+        onSubmit={(values, formikActions) => handleRegister(navigation, session, user, values, formikActions)}
         validate={validateRegisterForm}
         validateOnChange={false}
       >
@@ -294,7 +301,15 @@ function RegisterPage({ navigation }) {
                     onPress={handleSubmit}
                     style={registerPageStyle.submitButton}
                   >
-                    <Text style={registerPageStyle.submitButtonText}>REGISTER</Text>
+                    <Text style={registerPageStyle.submitButtonText}>
+                      {
+                        user.username ? (
+                          'EDIT'
+                        ) : (
+                          'REGISTER'
+                        )
+                      }
+                    </Text>
                   </TouchableOpacity>
                 )
               }

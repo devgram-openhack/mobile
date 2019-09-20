@@ -1,38 +1,41 @@
-// Mockups until the backend is ready
+import Toast from 'react-native-simple-toast';
 
-const token = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+// Mockups until the backend is ready
 
 const likes = [true, false, false];
 const dislikes = [false, true, false];
 
-const users = [
-  {
+const users = {
+  carl: {
     avatar: 'https://avatars0.githubusercontent.com/u/25509361?s=460',
     name: 'Carl Grimes',
     username: 'carl',
-    role: 'Designer',
+    specialization: 'Designer',
     description: 'I\'m from California, 22 years old, and have 3-year experience with UX design.',
+    email: 'carl@gmail.com',
   },
-  {
+  henry: {
     avatar: 'https://avatars0.githubusercontent.com/u/25509362?s=460',
     name: 'Henry Peletier',
     username: 'henry',
-    role: 'Developer',
+    specialization: 'Developer',
     description: 'I develop with Javascript.',
+    email: 'henry@gmail.com',
   },
-  {
+  carol: {
     avatar: 'https://avatars0.githubusercontent.com/u/25509363?s=460',
     name: 'Carol Peletier',
     username: 'carol',
-    role: 'Mentor',
+    specialization: 'Mentor',
     description: 'I mentor projects when it comes to the design.',
+    email: 'carol@gmail.com',
   },
-];
+};
 
 const posts = [
   {
     id: '0',
-    author: users[0],
+    author: users.carl,
     title: 'Project: Bookcademy',
     images: [
       'https://ph-files.imgix.net/d6e8efc6-3f40-4fc4-89e7-8b7322929eb8?auto=format&auto=compress&codec=mozjpeg&cs=strip&w=627.97583081571&h=380&fit=max',
@@ -44,10 +47,12 @@ const posts = [
     comments: 2,
     liked: likes[0],
     disliked: dislikes[0],
+    createdTimestamp: 110,
+    modifiedTimestamp: 110,
   },
   {
     id: '1',
-    author: users[1],
+    author: users.henry,
     title: 'Idea: Humans',
     images: [
       'https://ph-files.imgix.net/a6c447c1-de7f-4e96-9062-f9d3b4dcbb05?auto=format&auto=compress&codec=mozjpeg&cs=strip&w=635&h=380&fit=max',
@@ -58,10 +63,12 @@ const posts = [
     comments: 0,
     liked: likes[1],
     disliked: dislikes[1],
+    createdTimestamp: 111,
+    modifiedTimestamp: 111,
   },
   {
     id: '2',
-    author: users[0],
+    author: users.carl,
     title: 'Idea: Bookcademy',
     images: [],
     description: 'Hello everyone, we have an idea to turn non-fiction books into a fun, useful and practical way to learn. No images yet, but what do you think?',
@@ -70,182 +77,325 @@ const posts = [
     comments: 0,
     liked: likes[2],
     disliked: dislikes[2],
+    createdTimestamp: 112,
+    modifiedTimestamp: 112,
   },
 ];
 
 const comments = [
-  {
-    id: '0',
-    author: users[1],
-    description: 'Wow!',
-  },
-  {
-    id: '1',
-    author: users[2],
-    description: 'I really this this!',
-  },
-  {
-    id: '2',
-    author: users[0],
-    description: 'Thanks, guys!',
-  },
+  [
+    {
+      id: '0',
+      author: users.henry,
+      description: 'Wow!',
+      createdTimestamp: 113,
+      modifiedTimestamp: 113,
+    },
+    {
+      id: '1',
+      author: users.carol,
+      description: 'I really this this!',
+      createdTimestamp: 114,
+      modifiedTimestamp: 114,
+    },
+    {
+      id: '2',
+      author: users.carl,
+      description: 'Thanks, guys!',
+      createdTimestamp: 115,
+      modifiedTimestamp: 115,
+    },
+  ],
+  [],
+  [],
 ];
 
 const api = {
   async get(url) {
-    switch (url) {
-      case '/posts?page=1':
-        return {
-          data: {
-            success: true,
-            isLastPage: false,
-            posts: posts.slice(0, 2),
+    let matches;
+
+    matches = url.match(/^\/posts\?page=(.+)/);
+
+    if (matches) {
+      const page = parseInt(matches[1]);
+      const startSlice = 2 * (page - 1);
+      const endSlice = startSlice + 2;
+      const isLastPage = endSlice > posts.length;
+
+      Toast.show(`Getting posts ${page} ${startSlice} ${endSlice} ${isLastPage}...`);
+
+      return {
+        data: {
+          sucess: true,
+          isLastPage,
+          posts: posts.slice(startSlice, endSlice),
+        },
+      };
+    }
+
+    matches = url.match(/^\/post\/(.+?)\/comments\?page=(.+)/);
+
+    if (matches) {
+      const post = parseInt(matches[1]);
+      const page = parseInt(matches[2]);
+      const startSlice = 2 * (page - 1);
+      const endSlice = startSlice + 2;
+      const isLastPage = endSlice > comments[post].length;
+
+      Toast.show(`Getting comments ${post} ${page} ${startSlice} ${endSlice} ${isLastPage}...`);
+
+      return {
+        data: {
+          success: true,
+          isLastPage,
+          comments: comments[post].slice(startSlice, endSlice),
+          post: {
+            ...posts[post],
+            comments: comments[post].length,
           },
-        };
-      case '/posts?page=2':
-        return {
-          data: {
-            success: true,
-            isLastPage: true,
-            posts: posts.slice(2),
-          },
-        };
-      case '/post/0/comments?page=1':
-        return {
-          data: {
-            success: true,
-            isLastPage: false,
-            comments: comments.slice(0, 2),
-            post: posts[0],
-          },
-        };
-      case '/post/0/comments?page=2':
-        return {
-          data: {
-            success: true,
-            isLastPage: true,
-            comments: comments.slice(2),
-            post: {
-              ...posts[0],
-              comments: 3,
-            },
-          },
-        };
-      case '/post/1/comments?page=1':
-        return {
-          data: {
-            success: true,
-            isLastPage: true,
-            comments: [],
-            post: posts[1],
-          },
-        };
-      case '/post/2/comments?page=1':
-        return {
-          data: {
-            success: true,
-            isLastPage: true,
-            comments: [],
-            post: posts[2],
-          },
-        };
-      case '/user/carl':
-        return {
-          data: {
-            success: true,
-            user: users[0],
-          },
-        };
-      case '/user/henry':
-        return {
-          data: {
-            success: true,
-            user: users[1],
-          },
-        };
-      case '/user/carol':
-        return {
-          data: {
-            success: true,
-            user: users[2],
-          },
-        };
-      case '/user/carl/posts?page=1':
-        return {
-          data: {
-            success: true,
-            isLastPage: true,
-            posts: posts.filter(post => post.author.username === 'carl'),
-          },
-        };
-      case '/user/henry/posts?page=1':
-        return {
-          data: {
-            success: true,
-            isLastPage: true,
-            posts: posts.filter(post => post.author.username === 'henry'),
-          },
-        };
-      case '/user/carol/posts?page=1':
-        return {
-          data: {
-            success: true,
-            isLastPage: true,
-            posts: posts.filter(post => post.author.username === 'carol'),
-          },
-        };
+        },
+      };
+    }
+
+    matches = url.match(/^\/user\/(.+?)\/posts\?page=(.+)/);
+
+    if (matches) {
+      const username = matches[1];
+      const page = parseInt(matches[2]);
+      const userPosts = posts.filter(post => post.author.username === username);
+      const startSlice = 2 * (page - 1);
+      const endSlice = startSlice + 2;
+      const isLastPage = endSlice >= userPosts.length;
+
+      Toast.show(`Getting posts for user ${username} ${page} ${startSlice} ${endSlice} ${isLastPage}...`);
+
+      return {
+        data: {
+          success: true,
+          isLastPage,
+          posts: userPosts.slice(startSlice, endSlice),
+        },
+      };
+    }
+
+    matches = url.match(/^\/user\/(.+)/);
+
+    if (matches) {
+      const username = matches[1];
+
+      Toast.show(`Getting user ${username}...`);
+
+      return {
+        data: {
+          success: true,
+          user: users[username],
+        },
+      };
     }
   },
 
-  async post(url) {
-    switch (url) {
-      case '/login':
-      case '/register':
-      case '/posts':
-      case '/post/0/comments':
-      case '/post/1/comments':
-      case '/post/2/comments':
+  async post(url, data, headers) {
+    let matches;
+
+    matches = url.match(/^\/login/);
+
+    if (matches) {
+      Toast.show('Logging in...');
+
+      const user = Object.keys(users).map(username => users[username]).filter(user => user.username === data.usernameOrEmail || user.email === data.usernameOrEmail)[0];
+
+      if (user) {
         return {
           data: {
             success: true,
             session: {
-              token,
-              username: 'carl',
+              token: `ABC_${user.username}`,
+              username: user.username,
             },
           },
         };
-      case '/post/0/likes':
-      case '/post/1/likes':
-      case '/post/2/likes': {
-        const num = url.match(/\d/)[0];
+      } else {
+        return {
+          data: {
+            success: false,
+            message: 'User does not exist or invalid password!',
+          },
+        };
+      }
+    }
 
-        likes[num] = !likes[num];
+    matches = url.match(/^\/register/);
+
+    if (matches) {
+      Toast.show('Registering...');
+
+      const user = Object.keys(users).map(username => users[username]).filter(user => user.username === data.username || user.email === data.username)[0];
+
+      if (user) {
+        return {
+          data: {
+            success: false,
+            message: 'User already exists!',
+          },
+        };
+      } else {
+        data.avatar = data.avatar.uri;
+        users[data.username] = data;
 
         return {
           data: {
             success: true,
-            post: {
-              ...posts[num],
-              liked: likes[num],
-              disliked: dislikes[num],
+            session: {
+              token: `ABC_${data.username}`,
+              username: data.username,
             },
           },
         };
       }
-      case '/post/0/dislikes':
-      case '/post/1/dislikes':
-      case '/post/2/dislikes': {
-        const num = url.match(/\d/)[0];
+    }
 
-        dislikes[num] = !dislikes[num];
+    matches = url.match(/^\/logout/);
+
+    if (matches) {
+      Toast.show('Logging out...');
+
+      return {
+        data: {
+          success: true,
+        },
+      };
+    }
+
+    matches = url.match(/^\/posts/);
+
+    if (matches) {
+      Toast.show('Creating post...');
+
+      const now = Date.now();
+
+      data.id = posts.length.toString();
+      data.author = users[headers.Authorization.split('_')[1]];
+      data.images = data.images.filter(image => image.uri);
+      data.createdTimestamp = now;
+      data.modifiedTimestamp = now;
+      posts.push(data);
+      comments.push([]);
+      likes.push(false);
+      dislikes.push(false);
+
+      return {
+        data: {
+          success: true,
+        },
+      };
+    }
+
+    matches = url.match(/^\/post\/(.+?)\/comments/);
+
+    if (matches) {
+      const post = parseInt(matches[1]);
+
+      Toast.show(`Creating comment ${post}...`);
+
+      const now = Date.now();
+
+      data.id = comments[post].length.toString();
+      data.author = users[headers.Authorization.split('_')[1]];
+      data.createdTimestamp = now;
+      data.modifiedTimestamp = now;
+      comments[post].push(data);
+
+      return {
+        data: {
+          success: true,
+        },
+      };
+    }
+
+    matches = url.match(/^\/post\/(.+?)\/(likes|dislikes)/);
+
+    if (matches) {
+      Toast.show('Liking / disliking post...');
+
+      const post = parseInt(matches[1]);
+      const action = matches[2];
+
+      if (action === 'likes') {
+        likes[post] = !likes[post];
+
+        if (likes[post] && dislikes[post]) {
+          dislikes[post] = false;
+        }
+      } else {
+        dislikes[post] = !dislikes[post];
+
+        if (dislikes[post] && likes[post]) {
+          likes[post] = false;
+        }
+      }
+
+      return {
+        data: {
+          success: true,
+          post: {
+            ...posts[post],
+            liked: likes[post],
+            disliked: dislikes[post],
+          },
+        },
+      };
+    }
+  },
+
+  async patch(url, data, headers) {
+    let matches;
+
+    matches = url.match(/^\/post\/(.+)/);
+
+    if (matches) {
+      const post = parseInt(matches[1]);
+
+      Toast.show(`Editing post ${post}...`);
+
+      data.id = post.toString();
+      data.author = users[headers.Authorization.split('_')[1]];
+      data.images = data.images.map(image => image.uri);
+      data.modifiedTimestamp = Date.now();
+      posts[post] = data;
+
+      return {
+        data: {
+          success: true,
+        },
+      };
+    }
+
+    matches = url.match(/^\/user\/(.+)/);
+
+    if (matches) {
+      const username = matches[1];
+
+      Toast.show(`Editing ${username}...`);
+
+      const user = Object.keys(users).map(username => users[username]).filter(user => user.username === data.username || user.email === data.username)[0];
+
+      if (user && (!headers.Authorization || username !== headers.Authorization.split('_')[1])) {
+        return {
+          data: {
+            success: false,
+            message: 'Username already in use!',
+          },
+        };
+      } else {
+        data.avatar = data.avatar.uri;
+        users[data.username] = data;
 
         return {
           data: {
             success: true,
-            post: {
-              ...posts[num],
-              liked: likes[num],
-              disliked: dislikes[num],
+            session: {
+              token: `ABC_${data.username}`,
+              username: data.username,
             },
           },
         };
