@@ -87,7 +87,7 @@ function ProfilePage({ navigation }) {
                       <TouchableOpacity
                         onPress={() => navigation.navigate('RegisterPage', {
                           session,
-                          user: state.user
+                          user: state.user,
                         })}
                       >
                         <Icon name='edit' style={profilePageStyle.userEditIcon} />
