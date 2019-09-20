@@ -19,6 +19,7 @@ import { api } from '../services/api';
 import { Post } from './Post';
 
 import { colors } from '../styles/colors';
+import { commonStyle } from '../styles/Common.style';
 import { postListStyle } from '../styles/PostList.style';
 
 async function loadPosts(params, session, state, setState) {
@@ -71,7 +72,7 @@ function PostList({ navigation, params }) {
 
   return (
     state.isLoading ? (
-      <View style={postListStyle.emptyContainer}>
+      <View style={commonStyle.containerCentered}>
         <ActivityIndicator
           color={colors.main}
           size={moderateScale(40)}
@@ -80,7 +81,7 @@ function PostList({ navigation, params }) {
     ) : (
       state.posts.length > 0 ? (
         <FlatList
-          contentContainerStyle={postListStyle.container}
+          contentContainerStyle={commonStyle.containerScrollable}
           data={state.posts}
           keyExtractor={item => `${item.id}_${item.modifiedTimestamp}`}
           onRefresh={() => refreshPage(params, session, state, setState)}
@@ -99,7 +100,7 @@ function PostList({ navigation, params }) {
         />
       ) : (
         <ScrollView
-          contentContainerStyle={postListStyle.container}
+          contentContainerStyle={commonStyle.containerScrollable}
           refreshControl={(
             <RefreshControl
               refreshing={state.isRefreshing}
@@ -107,7 +108,7 @@ function PostList({ navigation, params }) {
             />
           )}
         >
-          <View style={postListStyle.emptyContainer}>
+          <View style={commonStyle.containerCentered}>
             <Icon name='highlight-off' style={postListStyle.emptyContainerIcon} />
 
             <Text style={postListStyle.emptyContainerText}>

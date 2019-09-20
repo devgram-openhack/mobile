@@ -18,7 +18,7 @@ import { Page } from '../components/Page';
 import { LogoHeader } from '../components/LogoHeader';
 
 import { colors } from '../styles/colors';
-import { loginPageStyle } from '../styles/LoginPage.style';
+import { commonStyle } from '../styles/Common.style';
 
 async function handleLogin(navigation, values, formikActions) {
   Keyboard.dismiss();
@@ -74,9 +74,9 @@ function LoginPage({ navigation }) {
             status,
             values,
           }) => (
-            <View style={loginPageStyle.container}>
-              <View style={loginPageStyle.field}>
-                <Text style={loginPageStyle.fieldLabel}>Username or Email (*)</Text>
+            <View style={commonStyle.containerCentered}>
+              <View style={commonStyle.formField}>
+                <Text style={commonStyle.formFieldLabel}>Username or Email (*)</Text>
 
                 <TextInput
                   autoCompleteType='email'
@@ -84,40 +84,40 @@ function LoginPage({ navigation }) {
                   keyboardType='email-address'
                   onChangeText={handleChange('usernameOrEmail')}
                   placeholder='johndoe@example.com'
-                  style={loginPageStyle.fieldInput}
+                  style={commonStyle.formFieldInput}
                   value={values.usernameOrEmail}
                 />
 
                 {
                   errors.usernameOrEmail && (
-                    <Text style={loginPageStyle.fieldError}>{errors.usernameOrEmail}</Text>
+                    <Text style={commonStyle.formFieldError}>{errors.usernameOrEmail}</Text>
                   )
                 }
               </View>
 
-              <View style={loginPageStyle.field}>
-                <Text style={loginPageStyle.fieldLabel}>Password (*)</Text>
+              <View style={commonStyle.formField}>
+                <Text style={commonStyle.formFieldLabel}>Password (*)</Text>
 
                 <TextInput
                   autoCompleteType='off'
                   onChangeText={handleChange('password')}
                   placeholder='********'
                   secureTextEntry={true}
-                  style={loginPageStyle.fieldInput}
+                  style={commonStyle.formFieldInput}
                   value={values.password}
                 />
 
                 {
                   errors.password && (
-                    <Text style={loginPageStyle.fieldError}>{errors.password}</Text>
+                    <Text style={commonStyle.formFieldError}>{errors.password}</Text>
                   )
                 }
               </View>
 
               {
                 !!status && (
-                  <View style={loginPageStyle.field}>
-                    <Text style={loginPageStyle.fieldError}>{status}</Text>
+                  <View style={commonStyle.formField}>
+                    <Text style={commonStyle.formFieldError}>{status}</Text>
                   </View>
                 )
               }
@@ -131,9 +131,9 @@ function LoginPage({ navigation }) {
                 ) : (
                   <TouchableOpacity
                     onPress={handleSubmit}
-                    style={loginPageStyle.submitButton}
+                    style={commonStyle.buttonLarge}
                   >
-                    <Text style={loginPageStyle.submitButtonText}>LOG IN</Text>
+                    <Text style={commonStyle.buttonText}>LOG IN</Text>
                   </TouchableOpacity>
                 )
               }

@@ -136,47 +136,8 @@ const postStyle = StyleSheet.create({
     alignItems: 'center',
   },
 
-  newCommentField: {
-    marginBottom: moderateScale(16),
-    maxWidth: moderateScale(332),
-    width: '100%',
-  },
-
-  newCommentFieldInput: {
-    backgroundColor: colors.input,
-    borderColor: colors.bar,
-    borderRadius: moderateScale(4),
-    borderWidth: moderateScale(2),
-    marginBottom: moderateScale(8),
-    width: '100%',
-  },
-
-  newCommentFieldError: {
-    color: colors.error,
-    fontSize: moderateScale(16),
-    fontStyle: 'italic',
-    marginBottom: moderateScale(8),
-  },
-
   newCommentIcon: {
     marginBottom: moderateScale(16),
-  },
-
-  newCommentSubmitButton: {
-    alignSelf: 'center',
-    backgroundColor: colors.bar,
-    borderRadius: moderateScale(4),
-    marginBottom: moderateScale(16),
-    maxWidth: moderateScale(250),
-    padding: moderateScale(8),
-    width: '100%',
-  },
-
-  newCommentSubmitButtonText: {
-    color: colors.main,
-    fontSize: moderateScale(16),
-    fontWeight: 'bold',
-    textAlign: 'center',
   },
 
   commentsContainer: {
@@ -192,13 +153,6 @@ const postStyle = StyleSheet.create({
 
   commentDescription: {
     color: colors.text,
-  },
-
-  scrollContainer: {
-    alignItems: 'center',
-    flexGrow: 1,
-    padding: moderateScale(16),
-    paddingBottom: moderateScale(64),
   },
 });
 

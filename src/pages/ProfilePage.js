@@ -21,6 +21,7 @@ import { Header } from '../components/Header';
 import { PostList } from '../components/PostList';
 
 import { colors } from '../styles/colors';
+import { commonStyle } from '../styles/Common.style';
 import { profilePageStyle } from '../styles/ProfilePage.style';
 
 async function loadUser(navigation, session, username, setState) {
@@ -57,7 +58,7 @@ function ProfilePage({ navigation }) {
 
       {
         state.isLoading ? (
-          <View style={profilePageStyle.emptyContainer}>
+          <View style={commonStyle.containerCentered}>
             <ActivityIndicator
               color={colors.main}
               size={moderateScale(40)}
@@ -85,7 +86,7 @@ function ProfilePage({ navigation }) {
                   {
                     username === session.username && (
                       <TouchableOpacity
-                        onPress={() => navigation.navigate('RegisterPage', {
+                        onPress={() => navigation.navigate('EditProfilePage', {
                           session,
                           user: state.user,
                         })}
@@ -133,9 +134,9 @@ function ProfilePage({ navigation }) {
               ...state,
               isModalVisible: false,
             })}
-            style={profilePageStyle.closeModalButton}
+            style={commonStyle.buttonLarge}
           >
-            <Text style={profilePageStyle.closeModalButtonText}>CLOSE</Text>
+            <Text style={commonStyle.buttonText}>CLOSE</Text>
           </TouchableOpacity>
         </View>
       </Modal>

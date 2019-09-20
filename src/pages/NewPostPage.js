@@ -21,6 +21,7 @@ import { Page } from '../components/Page';
 import { LogoHeader } from '../components/LogoHeader';
 
 import { colors } from '../styles/colors';
+import { commonStyle } from '../styles/Common.style';
 import { newPostPageStyle } from '../styles/NewPostPage.style';
 
 async function handleNewPost(navigation, session, post, values, formikActions) {
@@ -95,27 +96,27 @@ function NewPostPage({ navigation }) {
             status,
             values,
           }) => (
-            <ScrollView contentContainerStyle={newPostPageStyle.container}>
-              <View style={newPostPageStyle.field}>
-                <Text style={newPostPageStyle.fieldLabel}>Title (*)</Text>
+            <ScrollView contentContainerStyle={commonStyle.containerScrollable}>
+              <View style={commonStyle.formField}>
+                <Text style={commonStyle.formFieldLabel}>Title (*)</Text>
 
                 <TextInput
                   autoCompleteType='off'
                   onChangeText={handleChange('title')}
                   placeholder='The title of your project / idea...'
-                  style={newPostPageStyle.fieldInput}
+                  style={commonStyle.formFieldInput}
                   value={values.title}
                 />
 
                 {
                   errors.title && (
-                    <Text style={newPostPageStyle.fieldError}>{errors.title}</Text>
+                    <Text style={commonStyle.formFieldError}>{errors.title}</Text>
                   )
                 }
               </View>
 
-              <View style={newPostPageStyle.field}>
-                <Text style={newPostPageStyle.fieldLabel}>Images</Text>
+              <View style={commonStyle.formField}>
+                <Text style={commonStyle.formFieldLabel}>Images</Text>
 
                 <View style={newPostPageStyle.fieldImageContainer}>
                   <Swiper showsButtons={values.images.length > 1}>
@@ -129,20 +130,20 @@ function NewPostPage({ navigation }) {
 
                 <TouchableOpacity
                   onPress={() => addImage(values.images, setFieldError, setFieldValue)}
-                  style={newPostPageStyle.fieldImageButton}
+                  style={commonStyle.buttonSmall}
                 >
-                  <Text style={newPostPageStyle.fieldImageButtonText}>ADD IMAGE</Text>
+                  <Text style={commonStyle.buttonText}>ADD IMAGE</Text>
                 </TouchableOpacity>
 
                 {
                   errors.images && (
-                    <Text style={newPostPageStyle.fieldError}>{errors.images}</Text>
+                    <Text style={commonStyle.formFieldError}>{errors.images}</Text>
                   )
                 }
               </View>
 
-              <View style={newPostPageStyle.field}>
-                <Text style={newPostPageStyle.fieldLabel}>Description (*)</Text>
+              <View style={commonStyle.formField}>
+                <Text style={commonStyle.formFieldLabel}>Description (*)</Text>
 
                 <TextInput
                   autoCompleteType='off'
@@ -150,21 +151,21 @@ function NewPostPage({ navigation }) {
                   numberOfLines={5}
                   onChangeText={handleChange('description')}
                   placeholder='Tell everyone about your project / idea...'
-                  style={newPostPageStyle.fieldInput}
+                  style={commonStyle.formFieldInput}
                   value={values.description}
                 />
 
                 {
                   errors.description && (
-                    <Text style={newPostPageStyle.fieldError}>{errors.description}</Text>
+                    <Text style={commonStyle.formFieldError}>{errors.description}</Text>
                   )
                 }
               </View>
 
               {
                 !!status && (
-                  <View style={newPostPageStyle.field}>
-                    <Text style={newPostPageStyle.fieldError}>{status}</Text>
+                  <View style={commonStyle.formField}>
+                    <Text style={commonStyle.formFieldError}>{status}</Text>
                   </View>
                 )
               }
@@ -178,9 +179,9 @@ function NewPostPage({ navigation }) {
                 ) : (
                   <TouchableOpacity
                     onPress={handleSubmit}
-                    style={newPostPageStyle.submitButton}
+                    style={commonStyle.buttonLarge}
                   >
-                    <Text style={newPostPageStyle.submitButtonText}>
+                    <Text style={commonStyle.buttonText}>
                       {
                         post.id ? (
                           'EDIT'

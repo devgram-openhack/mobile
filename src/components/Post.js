@@ -23,6 +23,7 @@ import { api } from '../services/api';
 import { utils } from '../utils';
 
 import { colors } from '../styles/colors';
+import { commonStyle } from '../styles/Common.style';
 import { postStyle } from '../styles/Post.style';
 
 async function handleLike(session, state, setState) {
@@ -272,28 +273,28 @@ function Post({ navigation, params, post }) {
                     values,
                   }) => (
                     <View style={postStyle.newCommentContainer}>
-                      <View style={postStyle.newCommentField}>
+                      <View style={commonStyle.formField}>
                         <TextInput
                           autoCompleteType='off'
                           multiline={true}
                           numberOfLines={5}
                           onChangeText={handleChange('description')}
                           placeholder='Type your comment here....'
-                          style={postStyle.newCommentFieldInput}
+                          style={commonStyle.formFieldInput}
                           value={values.description}
                         />
 
                         {
                           errors.description && (
-                            <Text style={postStyle.newCommentFieldError}>{errors.description}</Text>
+                            <Text style={commonStyle.formFieldError}>{errors.description}</Text>
                           )
                         }
                       </View>
 
                       {
                         !!status && (
-                          <View style={postStyle.newCommentField}>
-                            <Text style={postStyle.newCommentFieldError}>{status}</Text>
+                          <View style={commonStyle.formField}>
+                            <Text style={commonStyle.formFieldError}>{status}</Text>
                           </View>
                         )
                       }
@@ -308,9 +309,9 @@ function Post({ navigation, params, post }) {
                         ) : (
                           <TouchableOpacity
                             onPress={handleSubmit}
-                            style={postStyle.newCommentSubmitButton}
+                            style={commonStyle.buttonLarge}
                           >
-                            <Text style={postStyle.newCommentSubmitButtonText}>ADD COMMENT</Text>
+                            <Text style={commonStyle.buttonText}>ADD COMMENT</Text>
                           </TouchableOpacity>
                         )
                       }
@@ -362,7 +363,7 @@ function Post({ navigation, params, post }) {
   if (params.showComments) {
     return (
       <ScrollView
-        contentContainerStyle={postStyle.scrollContainer}
+        contentContainerStyle={commonStyle.containerScrollable}
         onScroll={({ nativeEvent }) => {
           if (utils.isCloseToBottom(nativeEvent, moderateScale(64)) && !state.isLoadingNext && !state.isRefreshing && state.comments.length > 0) {
             loadNextPage(session, state, setState);
