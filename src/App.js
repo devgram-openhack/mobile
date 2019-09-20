@@ -11,11 +11,6 @@ YellowBox.ignoreWarnings([
   'ViewPagerAndroid has been extracted',
 ]);
 
-/**
- * Creates the app element.
- *
- * @returns {React.ReactElement} The app element.
- */
 function App() {
   return (
     <Routes />

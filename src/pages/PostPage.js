@@ -1,29 +1,31 @@
 import React from 'react';
-import { ImageBackground, SafeAreaView } from 'react-native';
 import PropTypes from 'prop-types';
 
-import { HeaderComponent } from '../components/HeaderComponent';
-import { PostListComponent } from '../components/PostListComponent';
-
-import { postPageStyle } from './PostPage.style';
-
-import matrix from '../assets/matrix.jpg';
+import { Page } from '../components/Page';
+import { Header } from '../components/Header';
+import { Post } from '../components/Post';
 
 function PostPage({ navigation }) {
-  const details = navigation.getParam('details');
+  const post = navigation.getParam('post');
 
   return (
-    <SafeAreaView style={postPageStyle.container}>
-      <ImageBackground source={matrix} style={postPageStyle.background}>
-        <HeaderComponent navigation={navigation} />
-        <PostListComponent initialPosts={[details]} navigation={navigation} />
-      </ImageBackground>
-    </SafeAreaView>
+    <Page>
+      <Header navigation={navigation} />
+
+      <Post
+        navigation={navigation}
+        params={{
+          showAuthor: true,
+          showComments: true,
+        }}
+        post={post}
+      />
+    </Page>
   );
 }
 
 PostPage.propTypes = {
-  navigation: PropTypes.object.isRequired
+  navigation: PropTypes.object.isRequired,
 };
 
 export { PostPage };
