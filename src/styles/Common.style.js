@@ -15,6 +15,7 @@ const commonStyle = StyleSheet.create({
   },
 
   buttonSmall: {
+    alignSelf: 'center',
     backgroundColor: colors.bar,
     borderRadius: moderateScale(4),
     maxWidth: moderateScale(150),

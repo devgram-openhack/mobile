@@ -5,7 +5,7 @@ import { Page } from '../components/Page';
 import { LogoHeader } from '../components/LogoHeader';
 import { UserForm } from '../components/forms/UserForm';
 
-function RegisterPage({ navigation }) {
+function EditProfilePage({ navigation }) {
   return (
     <Page>
       <LogoHeader />
@@ -15,8 +15,8 @@ function RegisterPage({ navigation }) {
   );
 }
 
-RegisterPage.propTypes = {
+EditProfilePage.propTypes = {
   navigation: PropTypes.object.isRequired,
 };
 
-export { RegisterPage };
+export { EditProfilePage };

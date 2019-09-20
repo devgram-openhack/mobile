@@ -86,7 +86,7 @@ function ProfilePage({ navigation }) {
                   {
                     username === session.username && (
                       <TouchableOpacity
-                        onPress={() => navigation.navigate('RegisterPage', {
+                        onPress={() => navigation.navigate('EditProfilePage', {
                           session,
                           user: state.user,
                         })}
