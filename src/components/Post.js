@@ -149,12 +149,18 @@ function Post({ navigation, params, post }) {
             })}
           >
             <View style={postStyle.authorContainer}>
-              <Image source={{ uri: state.post.author.avatar }} style={postStyle.authorAvatar} />
+              {
+                state.post.author.avatar ? (
+                  <Image source={{ uri: state.post.author.avatar }} style={postStyle.authorAvatar} />
+                ) : (
+                  <Icon name='account-circle' style={postStyle.authorAvatarIcon} />
+                )
+              }
 
               <View>
                 <Text style={postStyle.authorName}>{`${state.post.author.name} (@${state.post.author.username})`}</Text>
 
-                <Text style={postStyle.authorRole}>{state.post.author.role}</Text>
+                <Text style={postStyle.authorRole}>{state.post.author.specialization}</Text>
               </View>
             </View>
           </TouchableOpacity>
@@ -164,7 +170,10 @@ function Post({ navigation, params, post }) {
       }
 
       <TouchableOpacity
-        onPress={() => navigation.navigate('PostPage', { post, session })}
+        onPress={() => navigation.navigate('PostPage', {
+          post: state.post,
+          session,
+        })}
       >
         <Text numberOfLines={params.showComments ? null : 2} style={postStyle.title}>{state.post.title}</Text>
       </TouchableOpacity>
@@ -186,7 +195,10 @@ function Post({ navigation, params, post }) {
       }
 
       <TouchableOpacity
-        onPress={() => navigation.navigate('PostPage', { post, session })}
+        onPress={() => navigation.navigate('PostPage', {
+          post: state.post,
+          session,
+        })}
       >
         <Text numberOfLines={params.showComments ? null : 3} style={postStyle.description}>{state.post.description}</Text>
       </TouchableOpacity>
@@ -211,13 +223,32 @@ function Post({ navigation, params, post }) {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity
-          onPress={() => navigation.navigate('PostPage', { post, session })}
-        >
-          <Icon name='comment' style={postStyle.commentActionIcon} />
+        <View style={postStyle.actionContainerRight}>
+          {
+            params.showComments && state.post.author.username === session.username && (
+              <TouchableOpacity
+                onPress={() => navigation.navigate('NewPostPage', {
+                  post: state.post,
+                  session,
+                })}
+                style={postStyle.editPostAction}
+              >
+                <Icon name='edit' style={postStyle.editPostActionIcon} />
+              </TouchableOpacity>
+            )
+          }
 
-          <Text style={postStyle.commentActionText}>{state.post.comments}</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('PostPage', {
+              post: state.post,
+              session,
+            })}
+          >
+            <Icon name='comment' style={postStyle.commentActionIcon} />
+
+            <Text style={postStyle.commentActionText}>{state.post.comments}</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {
@@ -297,7 +328,7 @@ function Post({ navigation, params, post }) {
                 ) : (
                   state.comments.length > 0 ? (
                     state.comments.map(comment => (
-                      <View key={comment.id} style={postStyle.commentContainer}>
+                      <View key={`${comment.id}_${comment.modifiedTimestamp}`} style={postStyle.commentContainer}>
                         <TouchableOpacity
                           onPress={() => navigation.navigate('ProfilePage', {
                             session,
@@ -306,7 +337,7 @@ function Post({ navigation, params, post }) {
                         >
                           <Text style={postStyle.authorName}>{`${comment.author.name} (@${comment.author.username})`}</Text>
 
-                          <Text style={postStyle.authorRole}>{comment.author.role}</Text>
+                          <Text style={postStyle.authorRole}>{comment.author.specialization}</Text>
                         </TouchableOpacity>
 
                         <Text style={postStyle.commentDescription}>{comment.description}</Text>

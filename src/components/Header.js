@@ -27,7 +27,10 @@ function Header({ navigation }) {
       </TouchableOpacity>
 
       <TouchableOpacity
-        onPress={() => navigation.navigate('ProfilePage', { session })}
+        onPress={() => navigation.navigate('ProfilePage', {
+          session,
+          username: session.username
+        })}
       >
         <Icon name='account-circle' style={headerStyle.accountIcon} />
       </TouchableOpacity>
