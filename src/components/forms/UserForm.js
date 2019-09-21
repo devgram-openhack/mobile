@@ -13,14 +13,17 @@ import { colors } from '../../styles/colors';
 import { sizes } from '../../styles/sizes';
 import { commonStyle } from '../../styles/Common.style';
 
-function UserForm({ navigation }) {
+function UserForm({ navigation, user }) {
+  if (!user) {
+    user = {};
+  }
+
   const session = navigation.getParam('session');
-  const user = navigation.getParam('user', {});
 
   async function handleUser(values, formikActions) {
     Keyboard.dismiss();
 
-    const [method, url] = user.username ? ['patch', `/user/${user.username}`] : ['post', '/register'];
+    const [method, url] = user.id ? ['patch', `/user/${user.username}`] : ['post', '/register'];
 
     const response = await api[method](url, values, session && {
       'Authorization': `Bearer ${session.token}`,
@@ -33,8 +36,8 @@ function UserForm({ navigation }) {
 
       navigation.navigate('MainPage', { session });
 
-      if (user.username) {
-        EventEmitter.dispatch('refresh');
+      if (user.id) {
+        EventEmitter.dispatch('edit-user', response.data.user);
       }
     } else {
       formikActions.setSubmitting(false);
@@ -295,6 +298,7 @@ function UserForm({ navigation }) {
 
 UserForm.propTypes = {
   navigation: PropTypes.object.isRequired,
+  user: PropTypes.object,
 };
 
 export { UserForm };

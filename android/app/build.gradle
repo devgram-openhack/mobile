@@ -135,8 +135,8 @@ android {
         applicationId "com.devgram"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode 000102
+        versionName "0.1.2"
     }
     splits {
         abi {

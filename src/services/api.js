@@ -4,31 +4,34 @@ import Toast from 'react-native-simple-toast';
 
 const users = {
   carl: {
+    id: '0',
     avatar: 'https://avatars0.githubusercontent.com/u/25509361?s=460',
     name: 'Carl Grimes',
     username: 'carl',
     specialization: 'Designer',
     description: 'I\'m from California, 22 years old, and have 3-year experience with UX design.',
     email: 'carl@gmail.com',
-    timestamp: 445,
+    modifiedTimestamp: 445,
   },
   henry: {
+    id: '1',
     avatar: 'https://avatars0.githubusercontent.com/u/25509362?s=460',
     name: 'Henry Peletier',
     username: 'henry',
     specialization: 'Developer',
     description: 'I develop with Javascript.',
     email: 'henry@gmail.com',
-    timestamp: 446,
+    modifiedTimestamp: 446,
   },
   carol: {
+    id: '2',
     avatar: 'https://avatars0.githubusercontent.com/u/25509363?s=460',
     name: 'Carol Peletier',
     username: 'carol',
     specialization: 'Mentor',
     description: 'I mentor projects when it comes to the design.',
     email: 'carol@gmail.com',
-    timestamp: 449,
+    modifiedTimestamp: 449,
   },
 };
 
@@ -44,7 +47,7 @@ const posts = [
     description: 'Hello everyone, this is the first draft of our project, we would appreciate your feedback.\n\nBooks are no longer theoretical knowledge. We turn non-fiction books into a fun, useful and practical way to learn. Each book is a course!',
     likes: 195,
     dislikes: 6,
-    comments: 2,
+    comments: 3,
     liked: true,
     disliked: false,
     createdTimestamp: 110,
@@ -238,6 +241,7 @@ const api = {
         };
       } else {
         data.avatar = data.avatar.uri;
+        data.id = Object.keys(users).length.toString();
         users[data.username] = data;
 
         return {
@@ -273,10 +277,14 @@ const api = {
 
       data.id = posts.length.toString();
       data.author = users[headers.Authorization.split('_')[1]];
-      data.images = data.images.filter(image => image.uri);
+      data.images = data.images.map(image => image.uri);
       data.createdTimestamp = now;
       data.modifiedTimestamp = now;
-      data.timestamp = now;
+      data.comments = 0;
+      data.likes = 0;
+      data.dislikes = 0;
+      data.liked = false;
+      data.disliked = false;
       posts.unshift(data);
       comments.unshift([]);
 
@@ -301,13 +309,16 @@ const api = {
       data.author = users[headers.Authorization.split('_')[1]];
       data.createdTimestamp = now;
       data.modifiedTimestamp = now;
-      data.timestamp = now;
       comments[index].unshift(data);
       posts[index].comments = comments[index].length;
 
       return {
         data: {
           success: true,
+          post: {
+            id: posts[index].id,
+            comments: posts[index].comments,
+          },
         },
       };
     }
@@ -350,7 +361,13 @@ const api = {
       return {
         data: {
           success: true,
-          post: posts[index],
+          post: {
+            id: posts[index].id,
+            likes: posts[index].likes,
+            dislikes: posts[index].dislikes,
+            liked: posts[index].liked,
+            disliked: posts[index].disliked,
+          },
         },
       };
     }
@@ -371,12 +388,12 @@ const api = {
       data.author = users[headers.Authorization.split('_')[1]];
       data.images = data.images.map(image => image.uri);
       data.modifiedTimestamp = Date.now();
-      data.timestamp = Date.now();
-      posts[index] = data;
+      posts[index] = Object.assign({}, posts[index], data);
 
       return {
         data: {
           success: true,
+          post: data,
         },
       };
     }
@@ -404,7 +421,7 @@ const api = {
         users[data.username].specialization = data.specialization;
         users[data.username].description = data.description;
         users[data.username].email = data.email;
-        users[data.username].timestamp = Date.now();
+        users[data.username].modifiedTimestamp = Date.now();
 
         return {
           data: {
@@ -413,6 +430,7 @@ const api = {
               token: `ABC_${data.username}`,
               username: data.username,
             },
+            user: users[data.username],
           },
         };
       }

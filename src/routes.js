@@ -12,6 +12,7 @@ import { PostPage } from './pages/PostPage';
 import { NewPostPage } from './pages/NewPostPage';
 import { LogoutPage } from './pages/LogoutPage';
 import { EditProfilePage } from './pages/EditProfilePage';
+import { EditPostPage } from './pages/EditPostPage';
 
 import { colors } from './styles/colors';
 
@@ -31,6 +32,7 @@ const Routes = createAppContainer(
         ProfilePage,
         PostPage,
         NewPostPage,
+        EditPostPage,
         EditProfilePage,
       }, {
         headerMode: 'none',

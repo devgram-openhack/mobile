@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, RefreshControl, ScrollView, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import PropTypes from 'prop-types';
+import uuid from 'uuid/v4';
 
 import { api } from '../services/api';
 import { EventEmitter } from '../services/EventEmitter';
@@ -41,10 +42,66 @@ function PostList({ authorUsername, navigation }) {
   }
 
   useEffect(() => {
-    const subscriber = EventEmitter.subscribe('refresh', refreshPage);
+    const subscribers = [];
 
-    return () => subscriber.unsubscribe();
-  }, []);
+    function updatePost(updatedPost) {
+      setState({
+        ...state,
+        posts: state.posts.map(post => {
+          if (post.id === updatedPost.id) {
+            post = Object.assign({}, post, updatedPost);
+            post.uuid = uuid();
+          }
+
+          return post;
+        }),
+      });
+    }
+
+    function updateAuthor(updatedAuthor) {
+      setState({
+        ...state,
+        posts: state.posts.map(post => {
+          if (post.author.id === updatedAuthor.id) {
+            post.author = Object.assign({}, post.author, updatedAuthor);
+            post.uuid = uuid();
+          }
+
+          return post;
+        }),
+      });
+    }
+
+    function refreshPage() {
+      setState({
+        ...state,
+        isLastPage: false,
+        isRefreshing: true,
+        nextPage: 1,
+      });
+    }
+
+    function subscribe() {
+      subscribers.push(
+        EventEmitter.subscribe('new-post', refreshPage),
+        EventEmitter.subscribe('edit-post', updatePost),
+        EventEmitter.subscribe('edit-user', updateAuthor),
+        EventEmitter.subscribe('like', updatePost),
+        EventEmitter.subscribe('dislike', updatePost),
+        EventEmitter.subscribe('new-comment', updatePost),
+      );
+    }
+
+    function unsubscribe() {
+      for (const subscriber of subscribers) {
+        subscriber.unsubscribe();
+      }
+    }
+
+    subscribe();
+
+    return unsubscribe;
+  }, [state]);
 
   useEffect(() => {
     async function loadPosts() {
@@ -55,13 +112,22 @@ function PostList({ authorUsername, navigation }) {
           'Authorization': `Bearer ${session.token}`,
         });
 
+        const posts = (state.isRefreshing ? response.data.posts : [...state.posts, ...response.data.posts])
+          .map(post => {
+            if (!post.uuid) {
+              post.uuid = uuid();
+            }
+
+            return post;
+          });
+
         setState({
           isLastPage: response.data.isLastPage,
           isLoading: false,
           isLoadingNext: false,
           isRefreshing: false,
           nextPage: state.nextPage + 1,
-          posts: state.isRefreshing ? response.data.posts : [...state.posts, ...response.data.posts],
+          posts,
         });
       }
     }
@@ -79,17 +145,13 @@ function PostList({ authorUsername, navigation }) {
         <FlatList
           contentContainerStyle={commonStyle.containerScrollable}
           data={state.posts}
-          keyExtractor={item => `${item.id}_${item.timestamp}_${item.author.timestamp}`}
+          keyExtractor={item => item.uuid}
           onRefresh={refreshPage}
           onEndReached={loadNextPage}
           onEndReachedThreshold={0.5}
           refreshing={state.isRefreshing}
           renderItem={({ item }) => (
-            <Post
-              navigation={navigation}
-              post={item}
-              showAuthor={!authorUsername}
-            />
+            <Post navigation={navigation} post={item} showAuthor={!authorUsername} />
           )}
         />
       ) : (

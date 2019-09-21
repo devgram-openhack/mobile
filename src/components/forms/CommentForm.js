@@ -23,7 +23,7 @@ function CommentForm({ navigation, post }) {
     if (response.data.success) {
       formikActions.resetForm();
 
-      EventEmitter.dispatch('refresh');
+      EventEmitter.dispatch('new-comment', response.data.post);
     } else {
       formikActions.setSubmitting(false);
       formikActions.setStatus(response.data.message);
