@@ -11,7 +11,7 @@ function Footer({ navigation }) {
   return (
     <View style={footerStyle.container}>
       <TouchableOpacity
-        onPress={() => navigation.navigate('HackathonsPage')}
+        onPress={() => navigation.navigate('HackathonsPage', { session })}
       >
         <Icon name='code' style={footerStyle.icon} />
       </TouchableOpacity>
@@ -23,7 +23,7 @@ function Footer({ navigation }) {
       </TouchableOpacity>
 
       <TouchableOpacity
-        onPress={() => navigation.navigate('TeamsPage')}
+        onPress={() => navigation.navigate('TeamsPage', { session })}
       >
         <Icon name='people' style={footerStyle.icon} />
       </TouchableOpacity>

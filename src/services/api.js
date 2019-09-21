@@ -2,6 +2,35 @@ import Toast from 'react-native-simple-toast';
 
 // Mockups until the backend is ready
 
+const hackathons = [
+  {
+    id: '2',
+    title: 'Shawee - OpenHack',
+    images: [
+      'https://shawee.io/images/welovehackathons.png',
+    ],
+    description: 'An online hackathon to develop solutions for enhancing the experience of participants in hackathons.',
+    isOpen: true,
+    isParticipating: true,
+  },
+  {
+    id: '1',
+    title: 'HackathonTest',
+    images: [],
+    description: 'In this hackathon you will develop solutions for something.',
+    isOpen: true,
+    isParticipating: false,
+  },
+  {
+    id: '0',
+    title: 'SpaceHacka',
+    images: [],
+    description: 'In this hackathon you will develop solutions for something space-related.',
+    isOpen: false,
+    isParticipating: false,
+  },
+];
+
 const users = {
   carl: {
     id: '0',
@@ -116,6 +145,25 @@ const comments = [
 const api = {
   async get(url) {
     let matches;
+
+    matches = url.match(/^\/hackathons\?page=(.+)/);
+
+    if (matches) {
+      const page = parseInt(matches[1]);
+      const startSlice = 2 * (page - 1);
+      const endSlice = startSlice + 2;
+      const isLastPage = endSlice > hackathons.length;
+
+      Toast.show(`Getting hackathons ${page} ${startSlice} ${endSlice} ${isLastPage}...`);
+
+      return {
+        data: {
+          sucess: true,
+          isLastPage,
+          hackathons: hackathons.slice(startSlice, endSlice),
+        },
+      };
+    }
 
     matches = url.match(/^\/posts\?page=(.+)/);
 
@@ -293,6 +341,30 @@ const api = {
           success: true,
         },
       };
+    }
+
+    matches = url.match(/^\/hackathon\/(.+?)\/join/);
+
+    if (matches) {
+      const hackathon = parseInt(matches[1]);
+
+      Toast.show(`Joining hackathon ${hackathon}...`);
+
+      if (hackathons[hackathon].isOpen) {
+        hackathons[hackathon].isParticipating = true;
+
+        return {
+          data: {
+            success: true,
+          },
+        };
+      } else {
+        return {
+          data: {
+            success: false,
+          },
+        };
+      }
     }
 
     matches = url.match(/^\/post\/(.+?)\/comments/);
