@@ -7,12 +7,14 @@ import { AuthPage } from './pages/AuthPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { MainPage } from './pages/MainPage';
-import { ProfilePage } from './pages/ProfilePage';
-import { PostPage } from './pages/PostPage';
-import { NewPostPage } from './pages/NewPostPage';
 import { LogoutPage } from './pages/LogoutPage';
+import { ProfilePage } from './pages/ProfilePage';
 import { EditProfilePage } from './pages/EditProfilePage';
+import { PostPage } from './pages/PostPage';
 import { EditPostPage } from './pages/EditPostPage';
+import { HackathonsPage } from './pages/HackathonsPage';
+import { NewPostPage } from './pages/NewPostPage';
+import { TeamsPage } from './pages/TeamsPage';
 
 import { colors } from './styles/colors';
 
@@ -30,10 +32,12 @@ const Routes = createAppContainer(
       Home: createStackNavigator({
         MainPage,
         ProfilePage,
-        PostPage,
-        NewPostPage,
-        EditPostPage,
         EditProfilePage,
+        PostPage,
+        EditPostPage,
+        HackathonsPage,
+        NewPostPage,
+        TeamsPage,
       }, {
         headerMode: 'none',
       }),

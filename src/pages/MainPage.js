@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { Page } from './Page';
 import { Header } from '../components/Header';
 import { PostList } from '../components/PostList';
-import { FloatingButton } from '../components/FloatingButton';
+import { Footer } from '../components/Footer';
 
 function MainPage({ navigation }) {
   return (
@@ -13,7 +13,7 @@ function MainPage({ navigation }) {
 
       <PostList navigation={navigation} />
 
-      <FloatingButton navigation={navigation} />
+      <Footer navigation={navigation} />
     </Page>
   );
 }

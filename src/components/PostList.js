@@ -167,7 +167,7 @@ function PostList({ authorUsername, navigation }) {
           <View style={commonStyle.containerCentered}>
             <Icon name='highlight-off' style={commonStyle.containerCenteredIcon} />
 
-            <Text style={commonStyle.containerCenteredText}>{authorUsername ? 'This user has no posts. Scroll up to refresh the page.' : 'There are no posts. Scroll up to refresh the page or press the floating button at the corner of the screen to create a new post.'}</Text>
+            <Text style={commonStyle.containerCenteredText}>{authorUsername ? 'This user has no posts. Scroll up to refresh the page.' : 'There are no posts. Scroll up to refresh the page or use the button at the footer to create a new post.'}</Text>
           </View>
         </ScrollView>
       )
