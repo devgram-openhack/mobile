@@ -18,6 +18,13 @@ const postStyle = StyleSheet.create({
     padding: sizes['8'],
   },
 
+  subtitle: {
+    backgroundColor: colors.input,
+    color: colors.text,
+    fontWeight: 'bold',
+    padding: sizes['8'],
+  },
+
   swiper: {
     backgroundColor: colors.bar,
     height: sizes['200v'],

@@ -12,6 +12,8 @@ const hackathons = [
     description: 'An online hackathon to develop solutions for enhancing the experience of participants in hackathons.',
     isOpen: true,
     isParticipating: true,
+    maxMembersPerTeam: 5,
+    minMembersPerTeam: 1,
   },
   {
     id: '1',
@@ -20,6 +22,8 @@ const hackathons = [
     description: 'In this hackathon you will develop solutions for something.',
     isOpen: true,
     isParticipating: false,
+    maxMembersPerTeam: 4,
+    minMembersPerTeam: 2,
   },
   {
     id: '0',
@@ -28,6 +32,8 @@ const hackathons = [
     description: 'In this hackathon you will develop solutions for something space-related.',
     isOpen: false,
     isParticipating: false,
+    maxMembersPerTeam: 6,
+    minMembersPerTeam: 2,
   },
 ];
 
@@ -63,6 +69,33 @@ const users = {
     modifiedTimestamp: 449,
   },
 };
+
+const teams = [
+  {
+    id: '0',
+    hackathon: hackathons[0],
+    title: 'Bookcademers',
+    members: [
+      users.carl,
+    ],
+  },
+  {
+    id: '1',
+    hackathon: hackathons[0],
+    title: 'Humans',
+    members: [
+      users.henry,
+    ],
+  },
+  {
+    id: '2',
+    hackathon: hackathons[1],
+    title: '',
+    members: [
+      users.carl,
+    ],
+  },
+];
 
 const posts = [
   {
@@ -143,7 +176,7 @@ const comments = [
 ];
 
 const api = {
-  async get(url) {
+  async get(url, headers) {
     let matches;
 
     matches = url.match(/^\/hackathons\?page=(.+)/);
@@ -161,6 +194,47 @@ const api = {
           sucess: true,
           isLastPage,
           hackathons: hackathons.slice(startSlice, endSlice),
+        },
+      };
+    }
+
+    matches = url.match(/^\/teams\?page=(.+)/);
+
+    if (matches) {
+      const user = users[headers.Authorization.split('_')[1]];
+
+      const userTeams = teams.filter(team => team.members.includes(user));
+
+      const page = parseInt(matches[1]);
+      const startSlice = 2 * (page - 1);
+      const endSlice = startSlice + 2;
+      const isLastPage = endSlice > userTeams.length;
+
+      Toast.show(`Getting teams ${page} ${startSlice} ${endSlice} ${isLastPage}...`);
+
+      return {
+        data: {
+          sucess: true,
+          isLastPage,
+          teams: userTeams.slice(startSlice, endSlice).map(team => Object.assign({}, team)),
+        },
+      };
+    }
+
+    matches = url.match(/^\/hackathon\/(.+?)\/team/);
+
+    if (matches) {
+      const hackathon = matches[1];
+      const user = users[headers.Authorization.split('_')[1]];
+
+      const team = teams.filter(team => team.hackathon.id === hackathon && team.members.includes(user))[0];
+
+      Toast.show(`Getting team ${hackathon}...`);
+
+      return {
+        data: {
+          sucess: true,
+          team: Object.assign({}, team),
         },
       };
     }
@@ -447,6 +521,47 @@ const api = {
 
   async patch(url, data, headers) {
     let matches;
+
+    matches = url.match(/^\/team\/(.+)/);
+
+    if (matches) {
+      const teamId = matches[1];
+      const user = users[headers.Authorization.split('_')[1]];
+
+      const foundTeam = teams.filter(team => team.id === teamId && team.members.includes(user))[0];
+
+      Toast.show(`Editing team ${teamId}...`);
+
+      if (!foundTeam) {
+        return {
+          data: {
+            success: false,
+            message: 'Invalid credentials!',
+          },
+        };
+      }
+
+      const alreadyUsed = teams.filter(team => team.title === data.title)[0];
+
+      if (alreadyUsed) {
+        return {
+          data: {
+            success: false,
+            message: 'Name already in use by another team.',
+            team: Object.assign({}, foundTeam),
+          },
+        };
+      }
+
+      foundTeam.title = data.title;
+
+      return {
+        data: {
+          success: true,
+          team: Object.assign({}, foundTeam),
+        },
+      };
+    }
 
     matches = url.match(/^\/post\/(.+)/);
 

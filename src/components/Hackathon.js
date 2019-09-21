@@ -15,7 +15,7 @@ function Hackathon({ details, navigation }) {
 
   async function handleHackathon() {
     if (hackathon.isParticipating) {
-      navigation.navigate('TeamsPage', { hackathon });
+      navigation.navigate('TeamPage', { hackathon, session });
     } else {
       const response = await api.post(`/hackathon/${hackathon.id}/join`, {
         'Authorization': `Bearer ${session.token}`

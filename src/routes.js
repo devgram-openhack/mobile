@@ -15,6 +15,7 @@ import { EditPostPage } from './pages/EditPostPage';
 import { HackathonsPage } from './pages/HackathonsPage';
 import { NewPostPage } from './pages/NewPostPage';
 import { TeamsPage } from './pages/TeamsPage';
+import { TeamPage } from './pages/TeamPage';
 
 import { colors } from './styles/colors';
 
@@ -38,6 +39,7 @@ const Routes = createAppContainer(
         HackathonsPage,
         NewPostPage,
         TeamsPage,
+        TeamPage,
       }, {
         headerMode: 'none',
       }),

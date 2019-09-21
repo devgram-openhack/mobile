@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import PropTypes from 'prop-types';
+import Toast from 'react-native-simple-toast';
 
 import { api } from '../services/api';
 
@@ -35,6 +36,8 @@ function ProfilePage({ navigation }) {
           user: response.data.user,
         });
       } else {
+        Toast.show(response.data.message);
+
         navigation.goBack();
       }
     }

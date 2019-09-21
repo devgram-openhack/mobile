@@ -111,6 +111,15 @@ const commonStyle = StyleSheet.create({
     width: '100%',
   },
 
+  formFieldInputSmall: {
+    backgroundColor: colors.input,
+    borderColor: colors.bar,
+    borderRadius: sizes['4'],
+    borderWidth: sizes['2'],
+    marginBottom: sizes['8'],
+    width: sizes['150'],
+  },
+
   formFieldError: {
     color: colors.error,
     fontSize: sizes['16'],
