@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Page } from '../components/Page';
+import { Page } from './Page';
 import { Header } from '../components/Header';
 import { Post } from '../components/Post';
 
@@ -12,14 +12,7 @@ function PostPage({ navigation }) {
     <Page>
       <Header navigation={navigation} />
 
-      <Post
-        navigation={navigation}
-        params={{
-          showAuthor: true,
-          showComments: true,
-        }}
-        post={post}
-      />
+      <Post navigation={navigation} post={post} showAuthor={true} showComments={true} />
     </Page>
   );
 }

@@ -23,7 +23,8 @@
   },
   "plugins": [
     "jsdoc",
-    "react"
+    "react",
+    "react-hooks"
   ],
   "rules": {
     "indent": [
@@ -50,6 +51,8 @@
     ],
     "jsdoc/require-jsdoc": [
       "off"
-    ]
+    ],
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn"
   }
 }

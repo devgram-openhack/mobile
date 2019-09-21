@@ -1,12 +1,8 @@
 import React from 'react';
-import {
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import PropTypes from 'prop-types';
 
-import { Page } from '../components/Page';
+import { Page } from './Page';
 import { LogoHeader } from '../components/LogoHeader';
 
 import { commonStyle } from '../styles/Common.style';

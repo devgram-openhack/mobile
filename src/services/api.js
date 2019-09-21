@@ -2,9 +2,6 @@ import Toast from 'react-native-simple-toast';
 
 // Mockups until the backend is ready
 
-const likes = [true, false, false];
-const dislikes = [false, true, false];
-
 const users = {
   carl: {
     avatar: 'https://avatars0.githubusercontent.com/u/25509361?s=460',
@@ -13,6 +10,7 @@ const users = {
     specialization: 'Designer',
     description: 'I\'m from California, 22 years old, and have 3-year experience with UX design.',
     email: 'carl@gmail.com',
+    timestamp: 445,
   },
   henry: {
     avatar: 'https://avatars0.githubusercontent.com/u/25509362?s=460',
@@ -21,6 +19,7 @@ const users = {
     specialization: 'Developer',
     description: 'I develop with Javascript.',
     email: 'henry@gmail.com',
+    timestamp: 446,
   },
   carol: {
     avatar: 'https://avatars0.githubusercontent.com/u/25509363?s=460',
@@ -29,12 +28,13 @@ const users = {
     specialization: 'Mentor',
     description: 'I mentor projects when it comes to the design.',
     email: 'carol@gmail.com',
+    timestamp: 449,
   },
 };
 
 const posts = [
   {
-    id: '0',
+    id: '2',
     author: users.carl,
     title: 'Project: Bookcademy',
     images: [
@@ -45,8 +45,8 @@ const posts = [
     likes: 195,
     dislikes: 6,
     comments: 2,
-    liked: likes[0],
-    disliked: dislikes[0],
+    liked: true,
+    disliked: false,
     createdTimestamp: 110,
     modifiedTimestamp: 110,
   },
@@ -61,13 +61,13 @@ const posts = [
     likes: 155,
     dislikes: 3,
     comments: 0,
-    liked: likes[1],
-    disliked: dislikes[1],
+    liked: false,
+    disliked: true,
     createdTimestamp: 111,
     modifiedTimestamp: 111,
   },
   {
-    id: '2',
+    id: '0',
     author: users.carl,
     title: 'Idea: Bookcademy',
     images: [],
@@ -75,8 +75,8 @@ const posts = [
     likes: 30,
     dislikes: 122,
     comments: 0,
-    liked: likes[2],
-    disliked: dislikes[2],
+    liked: false,
+    disliked: false,
     createdTimestamp: 112,
     modifiedTimestamp: 112,
   },
@@ -85,7 +85,7 @@ const posts = [
 const comments = [
   [
     {
-      id: '0',
+      id: '2',
       author: users.henry,
       description: 'Wow!',
       createdTimestamp: 113,
@@ -99,7 +99,7 @@ const comments = [
       modifiedTimestamp: 114,
     },
     {
-      id: '2',
+      id: '0',
       author: users.carl,
       description: 'Thanks, guys!',
       createdTimestamp: 115,
@@ -137,10 +137,11 @@ const api = {
 
     if (matches) {
       const post = parseInt(matches[1]);
+      const index = posts.length - post - 1;
       const page = parseInt(matches[2]);
       const startSlice = 2 * (page - 1);
       const endSlice = startSlice + 2;
-      const isLastPage = endSlice > comments[post].length;
+      const isLastPage = endSlice > comments[index].length;
 
       Toast.show(`Getting comments ${post} ${page} ${startSlice} ${endSlice} ${isLastPage}...`);
 
@@ -148,11 +149,8 @@ const api = {
         data: {
           success: true,
           isLastPage,
-          comments: comments[post].slice(startSlice, endSlice),
-          post: {
-            ...posts[post],
-            comments: comments[post].length,
-          },
+          comments: comments[index].slice(startSlice, endSlice),
+          post: posts[index],
         },
       };
     }
@@ -278,10 +276,9 @@ const api = {
       data.images = data.images.filter(image => image.uri);
       data.createdTimestamp = now;
       data.modifiedTimestamp = now;
-      posts.push(data);
-      comments.push([]);
-      likes.push(false);
-      dislikes.push(false);
+      data.timestamp = now;
+      posts.unshift(data);
+      comments.unshift([]);
 
       return {
         data: {
@@ -299,11 +296,14 @@ const api = {
 
       const now = Date.now();
 
-      data.id = comments[post].length.toString();
+      const index = comments.length - post - 1;
+      data.id = comments[index].length.toString();
       data.author = users[headers.Authorization.split('_')[1]];
       data.createdTimestamp = now;
       data.modifiedTimestamp = now;
-      comments[post].push(data);
+      data.timestamp = now;
+      comments[index].unshift(data);
+      posts[index].comments = comments[index].length;
 
       return {
         data: {
@@ -318,30 +318,39 @@ const api = {
       Toast.show('Liking / disliking post...');
 
       const post = parseInt(matches[1]);
+      const index = posts.length - post - 1;
       const action = matches[2];
 
       if (action === 'likes') {
-        likes[post] = !likes[post];
-
-        if (likes[post] && dislikes[post]) {
-          dislikes[post] = false;
+        if (posts[index].liked) {
+          posts[index].liked = false;
+          posts[index].likes -= 1;
+        } else {
+          posts[index].liked = true;
+          posts[index].likes += 1;
+          if (posts[index].disliked) {
+            posts[index].disliked = false;
+            posts[index].dislikes -= 1;
+          }
         }
       } else {
-        dislikes[post] = !dislikes[post];
-
-        if (dislikes[post] && likes[post]) {
-          likes[post] = false;
+        if (posts[index].disliked) {
+          posts[index].disliked = false;
+          posts[index].dislikes -= 1;
+        } else {
+          posts[index].disliked = true;
+          posts[index].dislikes += 1;
+          if (posts[index].liked) {
+            posts[index].liked = false;
+            posts[index].likes -= 1;
+          }
         }
       }
 
       return {
         data: {
           success: true,
-          post: {
-            ...posts[post],
-            liked: likes[post],
-            disliked: dislikes[post],
-          },
+          post: posts[index],
         },
       };
     }
@@ -354,6 +363,7 @@ const api = {
 
     if (matches) {
       const post = parseInt(matches[1]);
+      const index = posts.length - post - 1;
 
       Toast.show(`Editing post ${post}...`);
 
@@ -361,7 +371,8 @@ const api = {
       data.author = users[headers.Authorization.split('_')[1]];
       data.images = data.images.map(image => image.uri);
       data.modifiedTimestamp = Date.now();
-      posts[post] = data;
+      data.timestamp = Date.now();
+      posts[index] = data;
 
       return {
         data: {
@@ -387,8 +398,13 @@ const api = {
           },
         };
       } else {
-        data.avatar = data.avatar.uri;
-        users[data.username] = data;
+        users[data.username].avatar = data.avatar.uri;
+        users[data.username].name = data.name;
+        users[data.username].username = data.username;
+        users[data.username].specialization = data.specialization;
+        users[data.username].description = data.description;
+        users[data.username].email = data.email;
+        users[data.username].timestamp = Date.now();
 
         return {
           data: {
