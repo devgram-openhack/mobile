@@ -1,22 +1,22 @@
 import { StyleSheet } from 'react-native';
-import { moderateScale } from 'react-native-size-matters';
 
 import { colors } from './colors';
+import { sizes } from './sizes';
 
 const logoHeaderStyle = StyleSheet.create({
   container: {
     alignItems: 'center',
     backgroundColor: colors.bar,
     borderBottomColor: colors.darkerMain,
-    borderBottomWidth: moderateScale(4),
+    borderBottomWidth: sizes['4'],
     borderTopColor: colors.main,
-    borderTopWidth: moderateScale(4),
-    padding: moderateScale(8),
+    borderTopWidth: sizes['4'],
+    padding: sizes['8'],
   },
 
   logo: {
     color: colors.main,
-    fontSize: moderateScale(24),
+    fontSize: sizes['24'],
   },
 });
 

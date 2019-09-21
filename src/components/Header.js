@@ -1,9 +1,5 @@
 import React from 'react';
-import {
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import PropTypes from 'prop-types';
 
@@ -11,6 +7,7 @@ import { headerStyle } from '../styles/Header.style';
 
 function Header({ navigation }) {
   const session = navigation.getParam('session');
+  const { username } = session;
 
   return (
     <View style={headerStyle.container}>
@@ -27,10 +24,7 @@ function Header({ navigation }) {
       </TouchableOpacity>
 
       <TouchableOpacity
-        onPress={() => navigation.navigate('ProfilePage', {
-          session,
-          username: session.username,
-        })}
+        onPress={() => navigation.navigate('ProfilePage', { session, username })}
       >
         <Icon name='account-circle' style={headerStyle.accountIcon} />
       </TouchableOpacity>

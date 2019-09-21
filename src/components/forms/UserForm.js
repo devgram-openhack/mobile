@@ -1,93 +1,88 @@
 import React from 'react';
-import {
-  ActivityIndicator,
-  Image,
-  Keyboard,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import AsyncStorage from '@react-native-community/async-storage';
+import { ActivityIndicator, Image, Keyboard, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { Formik } from 'formik';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import ImagePicker from 'react-native-image-picker';
-import { moderateScale } from 'react-native-size-matters';
 import PropTypes from 'prop-types';
 
 import { api } from '../../services/api';
+import { EventEmitter } from '../../services/EventEmitter';
+import { PersistentStorage } from '../../services/PersistentStorage';
 
 import { colors } from '../../styles/colors';
+import { sizes } from '../../styles/sizes';
 import { commonStyle } from '../../styles/Common.style';
-import { registerPageStyle } from '../../styles/RegisterPage.style';
-
-async function handleRegister(navigation, session, user, values, formikActions) {
-  Keyboard.dismiss();
-
-  const [method, url] = user.username ? ['patch', `/user/${user.username}`] : ['post', '/register'];
-
-  const response = await api[method](url, values, session ? {
-    'Authorization': `Bearer ${session.token}`
-  } : null);
-
-  if (response.data.success) {
-    const { session } = response.data;
-
-    await AsyncStorage.setItem('session', JSON.stringify(session));
-
-    navigation.navigate('MainPage', { session });
-  } else {
-    formikActions.setSubmitting(false);
-    formikActions.setStatus(response.data.message);
-  }
-}
-
-function validateRegisterForm(values) {
-  const errors = {};
-
-  if (!values.username) {
-    errors.username = 'Cannot be empty!';
-  }
-
-  if (!values.name) {
-    errors.name = 'Cannot be empty!';
-  }
-
-  if (!values.specialization) {
-    errors.specialization = 'Cannot be empty!';
-  }
-
-  if (!values.email) {
-    errors.email = 'Cannot be empty!';
-  }
-
-  if (!values.password) {
-    errors.password = 'Cannot be empty!';
-  }
-
-  if (values.confirmPassword !== values.password) {
-    errors.confirmPassword = 'Does not match password!';
-  }
-
-  return errors;
-}
-
-function selectAvatar(setFieldError, setFieldValue) {
-  ImagePicker.showImagePicker(response => {
-    if (response.error) {
-      setFieldError('avatar', 'Could not upload image!');
-    } else if (!response.didCancel) {
-      const { data, uri } = response;
-
-      setFieldValue('avatar', { data, uri });
-    }
-  });
-}
 
 function UserForm({ navigation }) {
   const session = navigation.getParam('session');
-  const user = navigation.getParam('user') || {};
+  const user = navigation.getParam('user', {});
+
+  async function handleUser(values, formikActions) {
+    Keyboard.dismiss();
+
+    const [method, url] = user.username ? ['patch', `/user/${user.username}`] : ['post', '/register'];
+
+    const response = await api[method](url, values, session && {
+      'Authorization': `Bearer ${session.token}`,
+    });
+
+    if (response.data.success) {
+      const { session } = response.data;
+
+      await PersistentStorage.setSession(session);
+
+      navigation.navigate('MainPage', { session });
+
+      if (user.username) {
+        EventEmitter.dispatch('refresh');
+      }
+    } else {
+      formikActions.setSubmitting(false);
+      formikActions.setStatus(response.data.message);
+    }
+  }
+
+  function validateUserForm(values) {
+    const errors = {};
+
+    if (!values.username) {
+      errors.username = 'Cannot be empty!';
+    }
+
+    if (!values.name) {
+      errors.name = 'Cannot be empty!';
+    }
+
+    if (!values.specialization) {
+      errors.specialization = 'Cannot be empty!';
+    }
+
+    if (!values.email) {
+      errors.email = 'Cannot be empty!';
+    } else if (!values.email.match(/^\S+@\S+\.\S+$/)) {
+      errors.email = 'Invalid email!';
+    }
+
+    if (!values.password) {
+      errors.password = 'Cannot be empty!';
+    } else if (values.confirmPassword !== values.password) {
+      errors.confirmPassword = 'Does not match password!';
+    }
+
+    return errors;
+  }
+
+  function selectAvatar(setFieldError, setFieldValue) {
+    ImagePicker.showImagePicker(response => {
+      if (response.error) {
+        setFieldError('avatar', 'Could not upload image!');
+      } else if (!response.didCancel) {
+        const { data, uri } = response;
+
+        setFieldValue('avatar', { data, uri });
+      }
+    });
+  }
 
   return (
     <Formik
@@ -104,31 +99,22 @@ function UserForm({ navigation }) {
         password: user.password || '',
         confirmPassword: user.confirmPassword || '',
       }}
-      onSubmit={(values, formikActions) => handleRegister(navigation, session, user, values, formikActions)}
-      validate={validateRegisterForm}
+      onSubmit={handleUser}
+      validate={validateUserForm}
       validateOnChange={false}
     >
       {
-        ({
-          errors,
-          handleChange,
-          handleSubmit,
-          isSubmitting,
-          setFieldError,
-          setFieldValue,
-          status,
-          values
-        }) => (
+        ({ errors, handleChange, handleSubmit, isSubmitting, setFieldError, setFieldValue, status, values }) => (
           <ScrollView contentContainerStyle={commonStyle.containerScrollable}>
             <View style={commonStyle.formField}>
               <Text style={commonStyle.formFieldLabel}>Avatar</Text>
 
-              <View style={registerPageStyle.fieldAvatar}>
+              <View style={commonStyle.formFieldAvatar}>
                 {
                   values.avatar.uri ? (
-                    <Image source={{ uri: values.avatar.uri }} style={registerPageStyle.fieldAvatarImage} />
+                    <Image source={{ uri: values.avatar.uri }} style={commonStyle.formFieldAvatarImage} />
                   ) : (
-                    <Icon name='account-circle' style={registerPageStyle.fieldAvatarIcon} />
+                    <Icon name='account-circle' style={commonStyle.formFieldAvatarIcon} />
                   )
                 }
 
@@ -189,7 +175,7 @@ function UserForm({ navigation }) {
               <TextInput
                 autoCompleteType='off'
                 onChangeText={handleChange('specialization')}
-                placeholder='Front-end Developer'
+                placeholder='Front-End Developer'
                 style={commonStyle.formFieldInput}
                 value={values.specialization}
               />
@@ -206,6 +192,7 @@ function UserForm({ navigation }) {
 
               <TextInput
                 autoCompleteType='off'
+                multiline={true}
                 numberOfLines={5}
                 onChangeText={handleChange('description')}
                 placeholder='Tell us a little about yourself...'
@@ -277,35 +264,26 @@ function UserForm({ navigation }) {
               }
             </View>
 
+            <View style={commonStyle.formField}>
+              {
+                isSubmitting ? (
+                  <ActivityIndicator color={colors.main} size={sizes['40']} />
+                ) : (
+                  <TouchableOpacity
+                    onPress={handleSubmit}
+                    style={commonStyle.buttonLarge}
+                  >
+                    <Text style={commonStyle.buttonText}>{user.username ? 'EDIT' : 'REGISTER'}</Text>
+                  </TouchableOpacity>
+                )
+              }
+            </View>
+
             {
               !!status && (
                 <View style={commonStyle.formField}>
                   <Text style={commonStyle.formFieldError}>{status}</Text>
                 </View>
-              )
-            }
-
-            {
-              isSubmitting ? (
-                <ActivityIndicator
-                  color={colors.main}
-                  size={moderateScale(40)}
-                />
-              ) : (
-                <TouchableOpacity
-                  onPress={handleSubmit}
-                  style={commonStyle.buttonLarge}
-                >
-                  <Text style={commonStyle.buttonText}>
-                    {
-                      user.username ? (
-                        'EDIT'
-                      ) : (
-                        'REGISTER'
-                      )
-                    }
-                  </Text>
-                </TouchableOpacity>
               )
             }
           </ScrollView>

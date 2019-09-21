@@ -1,42 +1,37 @@
-import React, {
-  useEffect,
-} from 'react';
-import {
-  ActivityIndicator,
-  View,
-} from 'react-native';
-import AsyncStorage from '@react-native-community/async-storage';
-import { moderateScale } from 'react-native-size-matters';
+import React, { useEffect } from 'react';
+import { ActivityIndicator, View } from 'react-native';
 import PropTypes from 'prop-types';
 
-import { Page } from '../components/Page';
+import { PersistentStorage } from '../services/PersistentStorage';
+
+import { Page } from './Page';
 import { LogoHeader } from '../components/LogoHeader';
 
 import { colors } from '../styles/colors';
+import { sizes } from '../styles/sizes';
 import { commonStyle } from '../styles/Common.style';
 
-async function checkLoggedIn(navigation) {
-  const session = JSON.parse((await AsyncStorage.getItem('session')) || '{}');
-
-  if (session.token) {
-    navigation.navigate('MainPage', { session });
-  } else {
-    navigation.navigate('AuthPage');
-  }
-}
-
 function LandingPage({ navigation }) {
-  useEffect(() => { checkLoggedIn(navigation); }, []);
+  useEffect(() => {
+    async function checkLoggedIn() {
+      const session = await PersistentStorage.getSession();
+
+      if (session.token) {
+        navigation.navigate('MainPage', { session });
+      } else {
+        navigation.navigate('AuthPage');
+      }
+    }
+
+    checkLoggedIn();
+  }, [navigation]);
 
   return (
     <Page>
       <LogoHeader />
 
       <View style={commonStyle.containerCentered}>
-        <ActivityIndicator
-          color={colors.main}
-          size={moderateScale(40)}
-        />
+        <ActivityIndicator color={colors.main} size={sizes['40']} />
       </View>
     </Page>
   );

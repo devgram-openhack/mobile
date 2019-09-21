@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Page } from '../components/Page';
+import { Page } from './Page';
 import { Header } from '../components/Header';
 import { PostList } from '../components/PostList';
 import { FloatingButton } from '../components/FloatingButton';

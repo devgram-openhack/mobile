@@ -1,44 +1,18 @@
-import React, {
-  useEffect,
-  useState,
-} from 'react';
-import {
-  ActivityIndicator,
-  Image,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import Modal from 'react-native-modal';
-import { moderateScale } from 'react-native-size-matters';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, View } from 'react-native';
 import PropTypes from 'prop-types';
 
 import { api } from '../services/api';
 
-import { Page } from '../components/Page';
+import { Page } from './Page';
 import { Header } from '../components/Header';
+import { User } from '../components/User';
 import { PostList } from '../components/PostList';
 
 import { colors } from '../styles/colors';
+import { sizes } from '../styles/sizes';
 import { commonStyle } from '../styles/Common.style';
 import { profilePageStyle } from '../styles/ProfilePage.style';
-
-async function loadUser(navigation, session, username, setState) {
-  const response = await api.get(`/user/${username}`, {
-    'Authorization': `Bearer ${session.token}`,
-  });
-
-  if (response.data.success) {
-    setState({
-      isLoading: false,
-      isModalVisible: false,
-      user: response.data.user,
-    });
-  } else {
-    navigation.goBack();
-  }
-}
 
 function ProfilePage({ navigation }) {
   const session = navigation.getParam('session');
@@ -46,11 +20,27 @@ function ProfilePage({ navigation }) {
 
   const [state, setState] = useState({
     isLoading: true,
-    isModalVisible: false,
     user: {},
   });
 
-  useEffect(() => { loadUser(navigation, session, username, setState); }, []);
+  useEffect(() => {
+    async function loadUser() {
+      const response = await api.get(`/user/${username}`, {
+        'Authorization': `Bearer ${session.token}`,
+      });
+
+      if (response.data.success) {
+        setState({
+          isLoading: false,
+          user: response.data.user,
+        });
+      } else {
+        navigation.goBack();
+      }
+    }
+
+    loadUser();
+  }, [navigation, session, username]);
 
   return (
     <Page>
@@ -59,87 +49,16 @@ function ProfilePage({ navigation }) {
       {
         state.isLoading ? (
           <View style={commonStyle.containerCentered}>
-            <ActivityIndicator
-              color={colors.main}
-              size={moderateScale(40)}
-            />
+            <ActivityIndicator color={colors.main} size={sizes['40']} />
           </View>
         ) : (
           <View style={profilePageStyle.container}>
-            <View style={profilePageStyle.userContainer}>
-              {
-                state.user.avatar ? (
-                  <Image source={{ uri: state.user.avatar }} style={profilePageStyle.userAvatar}/>
-                ) : (
-                  <Icon name='account-circle' style={profilePageStyle.userAvatarIcon} />
-                )
-              }
+            <User navigation={navigation} showDescription={true} user={state.user} />
 
-              <View style={profilePageStyle.userContainerRight}>
-                <View>
-                  <Text style={profilePageStyle.userName}>{`${state.user.name} (@${state.user.username})`}</Text>
-
-                  <Text style={profilePageStyle.userRole}>{state.user.specialization}</Text>
-                </View>
-
-                <View style={profilePageStyle.userActions}>
-                  {
-                    username === session.username && (
-                      <TouchableOpacity
-                        onPress={() => navigation.navigate('EditProfilePage', {
-                          session,
-                          user: state.user,
-                        })}
-                      >
-                        <Icon name='edit' style={profilePageStyle.userEditIcon} />
-                      </TouchableOpacity>
-                    )
-                  }
-
-                  <TouchableOpacity
-                    onPress={() => setState({
-                      ...state,
-                      isModalVisible: true,
-                    })}
-                  >
-                    <Icon name='note' style={profilePageStyle.userDescriptionIcon} />
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
-
-            <PostList
-              navigation={navigation}
-              params={{
-                authorUsername: username,
-              }}
-            />
+            <PostList authorUsername={username} navigation={navigation} />
           </View>
         )
       }
-
-      <Modal
-        backdropOpacity={0.8}
-        isVisible={state.isModalVisible}
-        onBackButtonPress={() => setState({
-          ...state,
-          isModalVisible: false,
-        })}
-      >
-        <View style={profilePageStyle.userDescriptionContainer}>
-          <Text style={profilePageStyle.userDescription}>{state.user.description}</Text>
-
-          <TouchableOpacity
-            onPress={() => setState({
-              ...state,
-              isModalVisible: false,
-            })}
-            style={commonStyle.buttonLarge}
-          >
-            <Text style={commonStyle.buttonText}>CLOSE</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
     </Page>
   );
 }

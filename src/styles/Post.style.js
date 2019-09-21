@@ -1,93 +1,58 @@
 import { StyleSheet } from 'react-native';
-import { moderateScale, verticalScale } from 'react-native-size-matters';
 
 import { colors } from './colors';
+import { sizes } from './sizes';
 
 const postStyle = StyleSheet.create({
   container: {
     backgroundColor: colors.card,
-    marginBottom: moderateScale(16),
-    width: moderateScale(332),
-  },
-
-  authorContainer: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    padding: moderateScale(8),
-  },
-
-  authorAvatar: {
-    borderRadius: moderateScale(20),
-    height: moderateScale(40),
-    marginRight: moderateScale(8),
-    width: moderateScale(40),
-  },
-
-  authorAvatarIcon: {
-    backgroundColor: colors.input,
-    borderRadius: moderateScale(20),
-    color: colors.bar,
-    fontSize: moderateScale(40),
-    marginRight: moderateScale(8),
-  },
-
-  authorName: {
-    color: colors.main,
-    fontWeight: 'bold',
-  },
-
-  authorRole: {
-    color: colors.main,
-    fontStyle: 'italic',
+    marginBottom: sizes['16'],
+    width: sizes['332'],
   },
 
   title: {
     backgroundColor: colors.bar,
     color: colors.main,
-    fontSize: moderateScale(16),
+    fontSize: sizes['16'],
     fontWeight: 'bold',
-    padding: moderateScale(8),
+    padding: sizes['8'],
   },
 
-  imageContainer: {
+  swiper: {
     backgroundColor: colors.bar,
-    height: verticalScale(200),
-    padding: moderateScale(8),
+    height: sizes['200v'],
+    padding: sizes['8'],
   },
 
   image: {
-    height: verticalScale(200),
-    resizeMode: 'contain',
+    height: sizes['200v'],
+    resizeMode: 'cover',
   },
 
   description: {
     color: colors.text,
-    padding: moderateScale(8),
+    padding: sizes['8'],
   },
 
-  actionContainer: {
+  footer: {
     alignItems: 'center',
     backgroundColor: colors.bar,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    padding: moderateScale(8),
+    padding: sizes['8'],
   },
 
-  actionContainerLeft: {
-    flexDirection: 'row',
-  },
-
-  actionContainerRight: {
+  actions: {
     flexDirection: 'row',
   },
 
   likeAction: {
-    marginRight: moderateScale(24),
+    marginRight: sizes['24'],
   },
 
   likeActionIcon: {
     color: colors.like,
-    fontSize: moderateScale(24),
+    fontSize: sizes['24'],
     opacity: 0.5,
   },
 
@@ -99,7 +64,7 @@ const postStyle = StyleSheet.create({
 
   dislikeActionIcon: {
     color: colors.dislike,
-    fontSize: moderateScale(24),
+    fontSize: sizes['24'],
     opacity: 0.5,
   },
 
@@ -110,17 +75,17 @@ const postStyle = StyleSheet.create({
   },
 
   editPostAction: {
-    marginRight: moderateScale(24),
+    marginRight: sizes['24'],
   },
 
   editPostActionIcon: {
     color: colors.text,
-    fontSize: moderateScale(24),
+    fontSize: sizes['24'],
   },
 
   commentActionIcon: {
     color: colors.main,
-    fontSize: moderateScale(24),
+    fontSize: sizes['24'],
   },
 
   commentActionText: {
@@ -128,31 +93,12 @@ const postStyle = StyleSheet.create({
     textAlign: 'center',
   },
 
-  focusAction: {
+  highlight: {
     opacity: 1,
   },
 
-  newCommentContainer: {
-    alignItems: 'center',
-  },
-
-  newCommentIcon: {
-    marginBottom: moderateScale(16),
-  },
-
-  commentsContainer: {
-    padding: moderateScale(8),
-  },
-
-  commentContainer: {
-    borderTopColor: colors.bar,
-    borderTopWidth: moderateScale(2),
-    marginBottom: moderateScale(8),
-    paddingTop: moderateScale(8),
-  },
-
-  commentDescription: {
-    color: colors.text,
+  comments: {
+    padding: sizes['8'],
   },
 });
 

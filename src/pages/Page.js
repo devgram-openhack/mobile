@@ -1,9 +1,5 @@
 import React from 'react';
-import {
-  ImageBackground,
-  SafeAreaView,
-  View,
-} from 'react-native';
+import { ImageBackground, SafeAreaView, View } from 'react-native';
 import PropTypes from 'prop-types';
 
 import { pageStyle } from '../styles/Page.style';
