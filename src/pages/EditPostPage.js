@@ -3,22 +3,22 @@ import PropTypes from 'prop-types';
 
 import { Page } from './Page';
 import { LogoHeader } from '../components/LogoHeader';
-import { UserForm } from '../components/forms/UserForm';
+import { PostForm } from '../components/forms/PostForm';
 
-function EditProfilePage({ navigation }) {
-  const user = navigation.getParam('user');
+function EditPostPage({ navigation }) {
+  const post = navigation.getParam('post');
 
   return (
     <Page>
       <LogoHeader />
 
-      <UserForm navigation={navigation} user={user} />
+      <PostForm navigation={navigation} post={post} />
     </Page>
   );
 }
 
-EditProfilePage.propTypes = {
+EditPostPage.propTypes = {
   navigation: PropTypes.object.isRequired,
 };
 
-export { EditProfilePage };
+export { EditPostPage };

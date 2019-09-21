@@ -12,8 +12,11 @@ import { colors } from '../../styles/colors';
 import { sizes } from '../../styles/sizes';
 import { commonStyle } from '../../styles/Common.style';
 
-function PostForm({ navigation }) {
-  const post = navigation.getParam('post', {});
+function PostForm({ navigation, post }) {
+  if (!post) {
+    post = {};
+  }
+
   const session = navigation.getParam('session');
 
   async function handlePost(values, formikActions) {
@@ -28,7 +31,11 @@ function PostForm({ navigation }) {
     if (response.data.success) {
       navigation.navigate('MainPage', { session });
 
-      EventEmitter.dispatch('refresh');
+      if (post.id) {
+        EventEmitter.dispatch('edit-post', response.data.post);
+      } else {
+        EventEmitter.dispatch('new-post');
+      }
     } else {
       formikActions.setSubmitting(false);
       formikActions.setStatus(response.data.message);
@@ -171,6 +178,7 @@ function PostForm({ navigation }) {
 
 PostForm.propTypes = {
   navigation: PropTypes.object.isRequired,
+  post: PropTypes.object,
 };
 
 export { PostForm };

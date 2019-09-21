@@ -3,6 +3,7 @@ import { ActivityIndicator, Image, RefreshControl, ScrollView, Text, TouchableOp
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import PropTypes from 'prop-types';
 import Swiper from 'react-native-swiper';
+import uuid from 'uuid/v4';
 
 import { api } from '../services/api';
 import { EventEmitter } from '../services/EventEmitter';
@@ -39,11 +40,11 @@ function Post({ navigation, post, showAuthor, showComments }) {
     if (response.data.success) {
       setState({
         ...state,
-        post: response.data.post,
+        post: Object.assign({}, state.post, response.data.post),
       });
 
       if (showComments) {
-        EventEmitter.dispatch('refresh');
+        EventEmitter.dispatch('like', response.data.post);
       }
     }
   }
@@ -56,11 +57,11 @@ function Post({ navigation, post, showAuthor, showComments }) {
     if (response.data.success) {
       setState({
         ...state,
-        post: response.data.post,
+        post: Object.assign({}, state.post, response.data.post),
       });
 
       if (showComments) {
-        EventEmitter.dispatch('refresh');
+        EventEmitter.dispatch('dislike', response.data.post);
       }
     }
   }
@@ -82,10 +83,63 @@ function Post({ navigation, post, showAuthor, showComments }) {
   }
 
   useEffect(() => {
-    const subscriber = EventEmitter.subscribe('refresh', refreshPage);
+    const subscribers = [];
 
-    return () => subscriber.unsubscribe();
-  }, []);
+    function updatePost(updatedPost) {
+      if (state.post.id === updatedPost.id) {
+        setState({
+          ...state,
+          post: Object.assign({}, state.post, updatedPost),
+        });
+      }
+    }
+
+    function updateAuthor(updatedAuthor) {
+      if (state.post.author.id === updatedAuthor.id) {
+        setState({
+          ...state,
+          comments: state.comments.map(comment => {
+            if (comment.author.id === updatedAuthor.id) {
+              comment.author = Object.assign({}, comment.author, updatedAuthor);
+              comment.uuid = uuid();
+            }
+
+            return comment;
+          }),
+          post: Object.assign({}, state.post, {
+            author: Object.assign({}, state.post.author, updatedAuthor),
+          }),
+        });
+      }
+    }
+
+    function refreshPage() {
+      setState({
+        ...state,
+        isLastPage: false,
+        isRefreshing: true,
+        nextPage: 1,
+      });
+    }
+
+    function subscribe() {
+      subscribers.push(
+        EventEmitter.subscribe('edit-post', updatePost),
+        EventEmitter.subscribe('edit-user', updateAuthor),
+        EventEmitter.subscribe('new-comment', refreshPage),
+      );
+    }
+
+    function unsubscribe() {
+      for (const subscriber of subscribers) {
+        subscriber.unsubscribe();
+      }
+    }
+
+    subscribe();
+
+    return unsubscribe;
+  }, [state]);
 
   useEffect(() => {
     async function loadComments() {
@@ -94,8 +148,17 @@ function Post({ navigation, post, showAuthor, showComments }) {
           'Authorization': `Bearer ${session.token}`,
         });
 
+        const comments = (state.isRefreshing ? response.data.comments : [...state.comments, ...response.data.comments])
+          .map(comment => {
+            if (!comment.uuid) {
+              comment.uuid = uuid();
+            }
+
+            return comment;
+          });
+
         setState({
-          comments: state.isRefreshing ? response.data.comments : [...state.comments, ...response.data.comments],
+          comments,
           isLastPage: response.data.isLastPage,
           isLoading: false,
           isLoadingNext: false,
@@ -175,7 +238,7 @@ function Post({ navigation, post, showAuthor, showComments }) {
           {
             showComments && state.post.author.username === session.username && (
               <TouchableOpacity
-                onPress={() => navigation.navigate('NewPostPage', {
+                onPress={() => navigation.navigate('EditPostPage', {
                   post: state.post,
                   session,
                 })}
@@ -202,10 +265,7 @@ function Post({ navigation, post, showAuthor, showComments }) {
       {
         showComments && (
           <View style={postStyle.comments}>
-            <CommentForm
-              navigation={navigation}
-              post={state.post}
-            />
+            <CommentForm navigation={navigation} post={state.post} />
 
             {
               state.isLoading ? (
@@ -213,7 +273,7 @@ function Post({ navigation, post, showAuthor, showComments }) {
               ) : (
                 state.comments.length > 0 ? (
                   state.comments.map(comment => (
-                    <Comment key={`${comment.id}_${comment.timestamp}`} comment={comment} navigation={navigation} />
+                    <Comment key={comment.uuid} comment={comment} navigation={navigation} />
                   ))
                 ) : (
                   <View style={commentStyle.container}>
