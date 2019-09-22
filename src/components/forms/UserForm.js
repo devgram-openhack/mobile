@@ -30,7 +30,7 @@ function UserForm({ navigation, user }) {
     });
 
     if (response.data.success) {
-      await PersistentStorage.beginSession(PersistentStorage.session);
+      await PersistentStorage.beginSession(response.data.session);
 
       navigation.navigate('MainPage');
 

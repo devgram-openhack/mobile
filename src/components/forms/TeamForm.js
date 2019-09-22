@@ -24,8 +24,6 @@ function TeamForm({ navigation, team }) {
     });
 
     if (response.data.success) {
-      await PersistentStorage.beginSession(PersistentStorage.session);
-
       navigation.goBack();
 
       EventEmitter.dispatch('edit-team', response.data.team);
