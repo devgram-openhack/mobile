@@ -37,9 +37,25 @@ function TeamPage({ navigation }) {
       }
     }
 
+    function updateMember(updatedMember) {
+      setState({
+        ...state,
+        team: Object.assign({}, state.team, {
+          members: state.team.members.map(member => {
+            if (member.id === updatedMember.id) {
+              member = Object.assign({}, member, updatedMember);
+            }
+
+            return member;
+          }),
+        }),
+      });
+    }
+
     function subscribe() {
       subscribers.push(
         EventEmitter.subscribe('edit-team', updateTeam),
+        EventEmitter.subscribe('edit-user', updateMember),
       );
     }
 
@@ -84,7 +100,7 @@ function TeamPage({ navigation }) {
           </View>
         ) : (
           state.team ? (
-            <View style={teamPageStyle.container}>
+            <View style={commonStyle.containerFull}>
               <View style={commonStyle.infoFull}>
                 {
                   state.team.avatar ? (
@@ -123,9 +139,12 @@ function TeamPage({ navigation }) {
                 }
 
                 {
-                  state.team.members.length < state.team.hackathon.maxMembersPerTeam && (
+                  state.team.hackathon.isOpen && state.team.members.length < state.team.hackathon.maxMembersPerTeam && (
                     <TouchableOpacity
-                      onPress={() => navigation.navigate('TeamMatchPage')}
+                      onPress={() => navigation.navigate('TeamMateSearchPage', {
+                        hackathon: state.team.hackathon,
+                        team: state.team,
+                      })}
                       style={commonStyle.buttonLarge}
                     >
                       <Text style={commonStyle.buttonText}>FIND TEAMMATES</Text>
@@ -139,7 +158,7 @@ function TeamPage({ navigation }) {
               <Text style={commonStyle.containerCenteredText}>You do not have a team for this hackathon yet.</Text>
 
               <TouchableOpacity
-                onPress={() => navigation.navigate('TeamMatchPage')}
+                onPress={() => navigation.navigate('TeamMateSearchPage', { hackathon })}
                 style={commonStyle.buttonLarge}
               >
                 <Text style={commonStyle.buttonText}>FIND TEAMMATES</Text>

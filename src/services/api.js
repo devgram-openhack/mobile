@@ -1,4 +1,4 @@
-// import Toast from 'react-native-simple-toast';
+// import SimpleToast from 'react-native-simple-toast';
 
 // Mockup until the backend is ready
 const DATABASE = {
@@ -15,6 +15,8 @@ const DATABASE = {
       likes: ['2'],
       dislikes: ['1'],
       hackathons: ['0', '2'],
+      teams: ['0', '2'],
+      ignoredUsers: [],
       createdTimestamp: 1569103194496,
       modifiedTimestamp: 1569103194496,
     },
@@ -30,6 +32,8 @@ const DATABASE = {
       likes: [],
       dislikes: [],
       hackathons: ['2'],
+      teams: ['1'],
+      ignoredUsers: [],
       createdTimestamp: 1569103194496,
       modifiedTimestamp: 1569103194496,
     },
@@ -45,6 +49,8 @@ const DATABASE = {
       likes: [],
       dislikes: [],
       hackathons: [],
+      teams: [],
+      ignoredUsers: [],
       createdTimestamp: 1569103194496,
       modifiedTimestamp: 1569103194496,
     },
@@ -194,6 +200,8 @@ const api = {
             likes: [...author.likes],
             dislikes: [...author.dislikes],
             hackathons: [...author.hackathons],
+            teams: [...author.teams],
+            ignoredUsers: [...author.ignoredUsers],
           }),
           images: [...databasePost.images],
           liked: loggedInUser.likes.includes(id),
@@ -208,7 +216,7 @@ const api = {
       const endSlice = startSlice + 2;
       const isLastPage = endSlice > posts.length;
 
-      // Toast.show(`Getting posts ${page} ${isLastPage}...`);
+      // SimpleToast.show(`Getting posts ${page} ${isLastPage}...`);
 
       return {
         data: {
@@ -241,6 +249,8 @@ const api = {
               likes: [...author.likes],
               dislikes: [...author.dislikes],
               hackathons: [...author.hackathons],
+              teams: [...author.teams],
+              ignoredUsers: [...author.ignoredUsers],
             }),
             images: [...databasePost.images],
             liked: loggedInUser.likes.includes(id),
@@ -256,7 +266,7 @@ const api = {
       const endSlice = startSlice + 2;
       const isLastPage = endSlice >= posts.length;
 
-      // Toast.show(`Getting posts for user ${username} ${page} ${isLastPage}...`);
+      // SimpleToast.show(`Getting posts for user ${username} ${page} ${isLastPage}...`);
 
       return {
         data: {
@@ -281,6 +291,8 @@ const api = {
           likes: [...databasePostAuthor.likes],
           dislikes: [...databasePostAuthor.dislikes],
           hackathons: [...databasePostAuthor.hackathons],
+          teams: [...databasePostAuthor.teams],
+          ignoredUsers: [...databasePostAuthor.ignoredUsers],
         }),
         images: [...databasePost.images],
         liked: databasePostAuthor.likes.includes(postId),
@@ -300,6 +312,8 @@ const api = {
               likes: [...author.likes],
               dislikes: [...author.dislikes],
               hackathons: [...author.hackathons],
+              teams: [...author.teams],
+              ignoredUsers: [...author.ignoredUsers],
             }),
           }));
         }
@@ -312,7 +326,7 @@ const api = {
       const endSlice = startSlice + 2;
       const isLastPage = endSlice > comments.length;
 
-      // Toast.show(`Getting comments for post ${postId} ${page} ${isLastPage}...`);
+      // SimpleToast.show(`Getting comments for post ${postId} ${page} ${isLastPage}...`);
 
       return {
         data: {
@@ -330,7 +344,7 @@ const api = {
     if (matches) {
       const username = matches[1];
 
-      // Toast.show(`Getting user ${username}...`);
+      // SimpleToast.show(`Getting user ${username}...`);
 
       for (const id in DATABASE.users) {
         const databaseUser = DATABASE.users[id];
@@ -343,6 +357,8 @@ const api = {
                 likes: [...databaseUser.likes],
                 dislikes: [...databaseUser.dislikes],
                 hackathons: [...databaseUser.hackathons],
+                teams: [...databaseUser.teams],
+                ignoredUsers: [...databaseUser.ignoredUsers],
               }),
             },
           };
@@ -399,7 +415,7 @@ const api = {
       const endSlice = startSlice + 2;
       const isLastPage = endSlice > hackathons.length;
 
-      // Toast.show(`Getting hackathons ${page} ${isLastPage}...`);
+      // SimpleToast.show(`Getting hackathons ${page} ${isLastPage}...`);
 
       return {
         data: {
@@ -420,31 +436,29 @@ const api = {
 
       const now = Date.now();
 
-      const teams = [];
-
-      for (const id in DATABASE.teams) {
-        const databaseTeam = DATABASE.teams[id];
+      const teams = loggedInUser.teams.map(teamId => {
+        const databaseTeam = DATABASE.teams[teamId];
         const databaseHackathon = DATABASE.hackathons[databaseTeam.hackathon];
 
-        if (databaseTeam.members.includes(userId)) {
-          teams.push(Object.assign({}, databaseTeam, {
-            hackathon: Object.assign({}, databaseHackathon, {
-              images: [...databaseHackathon.images],
-              isOpen: now < databaseHackathon.endTimestamp,
-              isParticipating: loggedInUser.hackathons.includes(id),
-            }),
-            members: databaseTeam.members.map(member => {
-              const databaseMember = DATABASE.users[member];
+        return Object.assign({}, databaseTeam, {
+          hackathon: Object.assign({}, databaseHackathon, {
+            images: [...databaseHackathon.images],
+            isOpen: now < databaseHackathon.endTimestamp,
+            isParticipating: true,
+          }),
+          members: databaseTeam.members.map(member => {
+            const databaseMember = DATABASE.users[member];
 
-              return Object.assign({}, databaseMember, {
-                likes: [...databaseMember.likes],
-                dislikes: [...databaseMember.dislikes],
-                hackathons: [...databaseMember.hackathons],
-              });
-            }),
-          }));
-        }
-      }
+            return Object.assign({}, databaseMember, {
+              likes: [...databaseMember.likes],
+              dislikes: [...databaseMember.dislikes],
+              hackathons: [...databaseMember.hackathons],
+              teams: [...databaseMember.teams],
+              ignoredUsers: [...databaseMember.ignoredUsers],
+            });
+          }),
+        });
+      });
 
       teams.sort((teamA, teamB) => {
         if (teamA.hackathon.isOpen && teamB.hackathon.isOpen) {
@@ -467,7 +481,7 @@ const api = {
       const endSlice = startSlice + 2;
       const isLastPage = endSlice > teams.length;
 
-      // Toast.show(`Getting teams for logged in user ${page} ${isLastPage}...`);
+      // SimpleToast.show(`Getting teams for logged in user ${page} ${isLastPage}...`);
 
       return {
         data: {
@@ -485,41 +499,127 @@ const api = {
     if (matches) {
       const hackathonId = matches[1];
       const userId = config.headers.Authorization.split('_')[1];
+      const loggedInUser = DATABASE.users[userId];
 
-      // Toast.show(`Getting team for logged in user for hackathon ${hackathonId}...`);
+      // SimpleToast.show(`Getting team for logged in user for hackathon ${hackathonId}...`);
 
-      for (const id in DATABASE.teams) {
-        const databaseTeam = DATABASE.teams[id];
+      const databaseTeam = loggedInUser.teams.map(teamId => DATABASE.teams[teamId]).filter(team => team.hackathon === hackathonId)[0];
 
-        if (databaseTeam.hackathon === hackathonId && databaseTeam.members.includes(userId)) {
-          const databaseHackathon = DATABASE.hackathons[hackathonId];
+      if (databaseTeam) {
+        const databaseHackathon = DATABASE.hackathons[hackathonId];
 
-          return {
-            data: {
-              success: true,
-              team: Object.assign({}, databaseTeam, {
-                hackathon: Object.assign({}, databaseHackathon, {
-                  images: [...databaseHackathon.images],
-                }),
-                members: databaseTeam.members.map(member => {
-                  const databaseMember = DATABASE.users[member];
-
-                  return Object.assign({}, databaseMember, {
-                    likes: [...databaseMember.likes],
-                    dislikes: [...databaseMember.dislikes],
-                    hackathons: [...databaseMember.hackathons],
-                  });
-                }),
+        return {
+          data: {
+            success: true,
+            team: Object.assign({}, databaseTeam, {
+              hackathon: Object.assign({}, databaseHackathon, {
+                images: [...databaseHackathon.images],
               }),
-            },
-          };
-        }
+              members: databaseTeam.members.map(member => {
+                const databaseMember = DATABASE.users[member];
+
+                return Object.assign({}, databaseMember, {
+                  likes: [...databaseMember.likes],
+                  dislikes: [...databaseMember.dislikes],
+                  hackathons: [...databaseMember.hackathons],
+                  teams: [...databaseMember.teams],
+                  ignoredUsers: [...databaseMember.ignoredUsers],
+                });
+              }),
+            }),
+          },
+        };
       }
 
       return {
         data: {
           sucess: true,
           team: null,
+        },
+      };
+    }
+
+    // GET /hackathon/{id}/users?keywords={keywords}
+    // Requires authentication
+    matches = url.match(/^\/hackathon\/(.+?)\/users\?keywords=(.+)/);
+
+    if (matches) {
+      if (!matches[2]) {
+        return {
+          success: false,
+          message: 'No keywords!',
+        };
+      }
+
+      const hackathonId = matches[1];
+      const keywords = matches[2].split(',');
+      const userId = config.headers.Authorization.split('_')[1];
+      const loggedInUser = DATABASE.users[userId];
+
+      // SimpleToast.show(`Getting users ${hackathonId} ${keywords.join(',')}...`);
+
+      const databaseHackathon = DATABASE.hackathons[hackathonId];
+
+      const results = [];
+
+      for (const id in DATABASE.users) {
+        const databaseUser = DATABASE.users[id];
+
+        if (!loggedInUser.ignoredUsers.includes(id) && databaseUser.hackathons.includes(hackathonId)) {
+          const databaseTeam = databaseUser.teams.map(teamId => DATABASE.teams[teamId]).filter(team => team.hackathon === hackathonId)[0];
+
+          if (!databaseTeam || databaseTeam.members.length < databaseHackathon.maxMembersPerTeam) {
+            let score = 0;
+
+            const specialization = databaseUser.specialization.toLowerCase();
+            const description = databaseUser.description.toLowerCase();
+
+            for (const keyword of keywords) {
+              if (specialization.match(keyword)) {
+                score += 2;
+              } else if (description.match(keyword)) {
+                score += 1;
+              }
+            }
+
+            if (score > 0) {
+              results.push({
+                score,
+                team: Object.assign({}, databaseTeam, {
+                  hackathon: Object.assign({}, databaseHackathon, {
+                    images: [...databaseHackathon.images],
+                  }),
+                  members: databaseTeam.members.map(member => {
+                    const databaseMember = DATABASE.users[member];
+
+                    return Object.assign({}, databaseMember, {
+                      likes: [...databaseMember.likes],
+                      dislikes: [...databaseMember.dislikes],
+                      hackathons: [...databaseMember.hackathons],
+                      teams: [...databaseMember.teams],
+                      ignoredUsers: [...databaseMember.ignoredUsers],
+                    });
+                  }),
+                }),
+                user: Object.assign({}, databaseUser, {
+                  likes: [...databaseUser.likes],
+                  dislikes: [...databaseUser.dislikes],
+                  hackathons: [...databaseUser.hackathons],
+                  teams: [...databaseUser.teams],
+                  ignoredUsers: [...databaseUser.ignoredUsers],
+                }),
+              });
+            }
+          }
+        }
+      }
+
+      results.sort((resultA, resultB) => resultA.score >= resultB.score ? -1 : 1);
+
+      return {
+        data: {
+          success: true,
+          results,
         },
       };
     }
@@ -532,7 +632,7 @@ const api = {
     matches = url.match(/^\/login/);
 
     if (matches) {
-      // Toast.show('Logging in...');
+      // SimpleToast.show('Logging in...');
 
       for (const id in DATABASE.users) {
         const databaseUser = DATABASE.users[id];
@@ -562,7 +662,7 @@ const api = {
     matches = url.match(/^\/register/);
 
     if (matches) {
-      // Toast.show('Registering...');
+      // SimpleToast.show('Registering...');
 
       for (const id in DATABASE.users) {
         const databaseUser = DATABASE.users[id];
@@ -588,6 +688,8 @@ const api = {
         likes: [],
         dislikes: [],
         hackathons: [],
+        teams: [],
+        ignoredUsers: [],
         createdTimestamp: now,
         modifiedTimestamp: now,
       };
@@ -608,7 +710,7 @@ const api = {
     matches = url.match(/^\/logout/);
 
     if (matches) {
-      // Toast.show('Logging out...');
+      // SimpleToast.show('Logging out...');
 
       return {
         data: {
@@ -622,7 +724,7 @@ const api = {
     matches = url.match(/^\/posts/);
 
     if (matches) {
-      // Toast.show('Creating post...');
+      // SimpleToast.show('Creating post...');
 
       const now = Date.now();
 
@@ -652,7 +754,7 @@ const api = {
     matches = url.match(/^\/post\/(.+?)\/(likes|dislikes)/);
 
     if (matches) {
-      // Toast.show('Liking / disliking post...');
+      // SimpleToast.show('Liking / disliking post...');
 
       const postId = matches[1];
       const action = matches[2];
@@ -709,7 +811,7 @@ const api = {
     if (matches) {
       const postId = matches[1];
 
-      // Toast.show(`Creating comment for post ${postId}...`);
+      // SimpleToast.show(`Creating comment for post ${postId}...`);
 
       const now = Date.now();
 
@@ -746,7 +848,7 @@ const api = {
     if (matches) {
       const hackathonId = matches[1];
 
-      // Toast.show(`Joining hackathon ${hackathonId}...`);
+      // SimpleToast.show(`Joining hackathon ${hackathonId}...`);
 
       const databaseHackathon = DATABASE.hackathons[hackathonId];
 
@@ -783,7 +885,7 @@ const api = {
     if (matches) {
       const postId = matches[1];
 
-      // Toast.show(`Editing post ${postId}...`);
+      // SimpleToast.show(`Editing post ${postId}...`);
 
       const databasePost = Object.assign({}, DATABASE.posts[postId], data, {
         author: config.headers.Authorization.split('_')[1],
@@ -803,6 +905,8 @@ const api = {
               likes: [...databasePostAuthor.likes],
               dislikes: [...databasePostAuthor.dislikes],
               hackathons: [...databasePostAuthor.hackathons],
+              teams: [...databasePostAuthor.teams],
+              ignoredUsers: [...databasePostAuthor.ignoredUsers],
             }),
             images: [...databasePost.images],
           }),
@@ -817,7 +921,7 @@ const api = {
     if (matches) {
       const userId = config.headers.Authorization.split('_')[1];
 
-      // Toast.show(`Editing profile ${userId}...`);
+      // SimpleToast.show(`Editing profile ${userId}...`);
 
       const databaseUser = Object.assign({}, DATABASE.users[userId], data, {
         avatar: data.avatar.uri,
@@ -837,6 +941,8 @@ const api = {
             likes: [...databaseUser.likes],
             dislikes: [...databaseUser.dislikes],
             hackathons: [...databaseUser.hackathons],
+            teams: [...databaseUser.teams],
+            ignoredUsers: [...databaseUser.ignoredUsers],
           }),
         },
       };
@@ -849,7 +955,7 @@ const api = {
     if (matches) {
       const teamId = matches[1];
 
-      // Toast.show(`Editing team name ${teamId}...`);
+      // SimpleToast.show(`Editing team name ${teamId}...`);
 
       for (const id in DATABASE.teams) {
         const databaseTeam = DATABASE.teams[id];
@@ -887,6 +993,8 @@ const api = {
                 likes: [...databaseMember.likes],
                 dislikes: [...databaseMember.dislikes],
                 hackathons: [...databaseMember.hackathons],
+                teams: [...databaseMember.teams],
+                ignoredUsers: [...databaseMember.ignoredUsers],
               });
             }),
           }),
