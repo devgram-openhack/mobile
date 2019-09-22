@@ -32,10 +32,12 @@ function UserForm({ navigation, user }) {
     if (response.data.success) {
       await PersistentStorage.beginSession(response.data.session);
 
-      navigation.goBack();
-
       if (user.id) {
+        navigation.goBack();
+
         EventEmitter.dispatch('edit-user', response.data.user);
+      } else {
+        navigation.navigate('MainPage');
       }
     } else {
       formikActions.setSubmitting(false);
