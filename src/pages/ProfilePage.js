@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import PropTypes from 'prop-types';
-import Toast from 'react-native-simple-toast';
+import SimpleToast from 'react-native-simple-toast';
 
 import { api } from '../services/api';
 import { EventEmitter } from '../services/EventEmitter';
@@ -15,7 +15,6 @@ import { PostList } from '../components/PostList';
 import { colors } from '../styles/colors';
 import { sizes } from '../styles/sizes';
 import { commonStyle } from '../styles/Common.style';
-import { profilePageStyle } from '../styles/ProfilePage.style';
 
 function ProfilePage({ navigation }) {
   const username = navigation.getParam('username');
@@ -68,7 +67,7 @@ function ProfilePage({ navigation }) {
           user: response.data.user,
         });
       } else {
-        Toast.show(response.data.message);
+        SimpleToast.show(response.data.message);
 
         navigation.goBack();
       }
@@ -87,7 +86,7 @@ function ProfilePage({ navigation }) {
             <ActivityIndicator color={colors.main} size={sizes['40']} />
           </View>
         ) : (
-          <View style={profilePageStyle.container}>
+          <View style={commonStyle.containerFull}>
             <User navigation={navigation} showDescription={true} user={state.user} />
 
             <PostList authorUsername={username} navigation={navigation} />

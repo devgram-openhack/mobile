@@ -107,6 +107,10 @@ const commonStyle = StyleSheet.create({
     textAlign: 'center',
   },
 
+  containerFull: {
+    flex: 1,
+  },
+
   containerScrollable: {
     alignItems: 'center',
     flexGrow: 1,
