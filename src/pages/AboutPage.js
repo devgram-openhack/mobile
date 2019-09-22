@@ -16,10 +16,10 @@ function AboutPage({ navigation }) {
       url: 'https://github.com/WKO8',
     },
     {
-      avatar: 'https://avatars1.githubusercontent.com/u/48861311?s=96&v=4',
+      avatar: 'https://avatars2.githubusercontent.com/u/55169953?s=460&v=4',
       name: 'João Oliveira',
       specialization: 'Business / Design',
-      url: 'https://github.com/devgram-openhack',
+      url: 'https://github.com/joaofrancaoliveira',
     },
     {
       avatar: 'https://avatars1.githubusercontent.com/u/48861311?s=96&v=4',
