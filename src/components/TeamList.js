@@ -24,22 +24,6 @@ function TeamList({ navigation }) {
     teams: [],
   });
 
-  function refreshPage() {
-    setState({
-      ...state,
-      isLastPage: false,
-      isRefreshing: true,
-      nextPage: 1,
-    });
-  }
-
-  function loadNextPage() {
-    setState({
-      ...state,
-      isLoadingNext: true,
-    });
-  }
-
   useEffect(() => {
     const subscribers = [];
 
@@ -57,9 +41,19 @@ function TeamList({ navigation }) {
       });
     }
 
+    function refreshPage() {
+      setState({
+        ...state,
+        isLastPage: false,
+        isRefreshing: true,
+        nextPage: 1,
+      });
+    }
+
     function subscribe() {
       subscribers.push(
         EventEmitter.subscribe('edit-team', updateTeam),
+        EventEmitter.subscribe('update-team', refreshPage),
       );
     }
 
@@ -76,35 +70,51 @@ function TeamList({ navigation }) {
 
   useEffect(() => {
     async function loadTeams() {
-      if (!state.isLastPage && (state.isLoading || state.isLoadingNext || state.isRefreshing)) {
-        const response = await api.get(`/me/teams?page=${state.nextPage}`, {
-          headers: {
-            'Authorization': `Bearer ${PersistentStorage.session.token}`,
-          },
+      const response = await api.get(`/me/teams?page=${state.nextPage}`, {
+        headers: {
+          'Authorization': `Bearer ${PersistentStorage.session.token}`,
+        },
+      });
+
+      const teams = (state.isRefreshing ? response.data.teams : [...state.teams, ...response.data.teams])
+        .map(team => {
+          if (!team.uuid) {
+            team.uuid = uuid();
+          }
+
+          return team;
         });
 
-        const teams = (state.isRefreshing ? response.data.teams : [...state.teams, ...response.data.teams])
-          .map(team => {
-            if (!team.uuid) {
-              team.uuid = uuid();
-            }
-
-            return team;
-          });
-
-        setState({
-          isLastPage: response.data.isLastPage,
-          isLoading: false,
-          isLoadingNext: false,
-          isRefreshing: false,
-          nextPage: state.nextPage + 1,
-          teams,
-        });
-      }
+      setState({
+        isLastPage: response.data.isLastPage,
+        isLoading: false,
+        isLoadingNext: false,
+        isRefreshing: false,
+        nextPage: state.nextPage + 1,
+        teams,
+      });
     }
 
-    loadTeams();
+    if (!state.isLastPage && (state.isLoading || state.isLoadingNext || state.isRefreshing)) {
+      loadTeams();
+    }
   }, [state]);
+
+  function refreshPage() {
+    setState({
+      ...state,
+      isLastPage: false,
+      isRefreshing: true,
+      nextPage: 1,
+    });
+  }
+
+  function loadNextPage() {
+    setState({
+      ...state,
+      isLoadingNext: true,
+    });
+  }
 
   return (
     state.isLoading ? (

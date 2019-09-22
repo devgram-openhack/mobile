@@ -36,6 +36,11 @@ const commonStyle = StyleSheet.create({
     width: sizes['332'],
   },
 
+  cardPadded: {
+    backgroundColor: colors.card,
+    width: sizes['316'],
+  },
+
   cardTitle: {
     backgroundColor: colors.bar,
     color: colors.main,
@@ -91,6 +96,11 @@ const commonStyle = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
     justifyContent: 'center',
+    padding: sizes['16'],
+  },
+
+  containerCenteredHorizontal: {
+    alignItems: 'center',
     padding: sizes['16'],
   },
 
@@ -226,6 +236,17 @@ const commonStyle = StyleSheet.create({
 
   infoTitle: {
     color: colors.main,
+    fontWeight: 'bold',
+  },
+
+  infoTitleMargin: {
+    color: colors.main,
+    fontWeight: 'bold',
+    marginBottom: sizes['8'],
+  },
+
+  infoTitleHighlight: {
+    color: colors.text,
     fontWeight: 'bold',
   },
 

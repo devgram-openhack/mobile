@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, RefreshControl, ScrollView, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import PropTypes from 'prop-types';
+import uuid from 'uuid/v4';
 
 import { api } from '../services/api';
+import { EventEmitter } from '../services/EventEmitter';
 import { PersistentStorage } from '../services/PersistentStorage';
 
 import { Hackathon } from './Hackathon';
@@ -22,6 +24,67 @@ function HackathonList({ navigation }) {
     nextPage: 1,
   });
 
+  useEffect(() => {
+    const subscribers = [];
+
+    function refreshPage() {
+      setState({
+        ...state,
+        isLastPage: false,
+        isRefreshing: true,
+        nextPage: 1,
+      });
+    }
+
+    function subscribe() {
+      subscribers.push(
+        EventEmitter.subscribe('update-team', refreshPage),
+      );
+    }
+
+    function unsubscribe() {
+      for (const subscriber of subscribers) {
+        subscriber.unsubscribe();
+      }
+    }
+
+    subscribe();
+
+    return unsubscribe;
+  }, [state]);
+
+  useEffect(() => {
+    async function loadHackathons() {
+      const response = await api.get(`/hackathons?page=${state.nextPage}`, {
+        headers: {
+          'Authorization': `Bearer ${PersistentStorage.session.token}`,
+        },
+      });
+
+      const hackathons = (state.isRefreshing ? response.data.hackathons : [...state.hackathons, ...response.data.hackathons])
+        .map(hackathon => {
+          if (!hackathon.uuid) {
+            hackathon.uuid = uuid();
+          }
+
+          return hackathon;
+        });
+
+      setState({
+        hackathons,
+        isLastPage: response.data.isLastPage,
+        isLoading: false,
+        isLoadingNext: false,
+        isRefreshing: false,
+        nextPage: state.nextPage + 1,
+      });
+    }
+
+    if (!state.isLastPage && (state.isLoading || state.isLoadingNext || state.isRefreshing)) {
+      loadHackathons();
+    }
+  }, [state]);
+
   function refreshPage() {
     setState({
       ...state,
@@ -38,29 +101,6 @@ function HackathonList({ navigation }) {
     });
   }
 
-  useEffect(() => {
-    async function loadHackathons() {
-      if (!state.isLastPage && (state.isLoading || state.isLoadingNext || state.isRefreshing)) {
-        const response = await api.get(`/hackathons?page=${state.nextPage}`, {
-          headers: {
-            'Authorization': `Bearer ${PersistentStorage.session.token}`,
-          },
-        });
-
-        setState({
-          hackathons: state.isRefreshing ? response.data.hackathons : [...state.hackathons, ...response.data.hackathons],
-          isLastPage: response.data.isLastPage,
-          isLoading: false,
-          isLoadingNext: false,
-          isRefreshing: false,
-          nextPage: state.nextPage + 1,
-        });
-      }
-    }
-
-    loadHackathons();
-  }, [state]);
-
   return (
     state.isLoading ? (
       <View style={commonStyle.containerCentered}>
@@ -71,13 +111,13 @@ function HackathonList({ navigation }) {
         <FlatList
           contentContainerStyle={commonStyle.containerScrollable}
           data={state.hackathons}
-          keyExtractor={item => item.id}
+          keyExtractor={item => item.uuid}
           onRefresh={refreshPage}
           onEndReached={loadNextPage}
           onEndReachedThreshold={0.5}
           refreshing={state.isRefreshing}
           renderItem={({ item }) => (
-            <Hackathon details={item} navigation={navigation} />
+            <Hackathon navigation={navigation} details={item} />
           )}
         />
       ) : (

@@ -19,6 +19,7 @@ import { TeamsPage } from './pages/TeamsPage';
 import { TeamPage } from './pages/TeamPage';
 import { EditTeamPage } from './pages/EditTeamPage';
 import { TeamMateSearchPage } from './pages/TeamMateSearchPage';
+import { PendingInvitesPage } from './pages/PendingInvitesPage';
 import { AboutPage } from './pages/AboutPage';
 import { LogoutPage } from './pages/LogoutPage';
 
@@ -54,6 +55,7 @@ const Routes = createAppContainer(
         TeamPage,
         EditTeamPage,
         TeamMateSearchPage,
+        PendingInvitesPage,
         AboutPage,
         LogoutPage,
       }),

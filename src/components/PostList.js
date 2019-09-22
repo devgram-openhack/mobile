@@ -14,7 +14,7 @@ import { colors } from '../styles/colors';
 import { sizes } from '../styles/sizes';
 import { commonStyle } from '../styles/Common.style';
 
-function PostList({ authorUsername, navigation }) {
+function PostList({ navigation, authorUsername }) {
   const [state, setState] = useState({
     isLastPage: false,
     isLoading: true,
@@ -23,22 +23,6 @@ function PostList({ authorUsername, navigation }) {
     nextPage: 1,
     posts: [],
   });
-
-  function refreshPage() {
-    setState({
-      ...state,
-      isLastPage: false,
-      isRefreshing: true,
-      nextPage: 1,
-    });
-  }
-
-  function loadNextPage() {
-    setState({
-      ...state,
-      isLoadingNext: true,
-    });
-  }
 
   useEffect(() => {
     const subscribers = [];
@@ -102,38 +86,54 @@ function PostList({ authorUsername, navigation }) {
     return unsubscribe;
   }, [state]);
 
+  function refreshPage() {
+    setState({
+      ...state,
+      isLastPage: false,
+      isRefreshing: true,
+      nextPage: 1,
+    });
+  }
+
+  function loadNextPage() {
+    setState({
+      ...state,
+      isLoadingNext: true,
+    });
+  }
+
   useEffect(() => {
     async function loadPosts() {
-      if (!state.isLastPage && (state.isLoading || state.isLoadingNext || state.isRefreshing)) {
-        const url = authorUsername ? `/user/${authorUsername}/posts?page=${state.nextPage}` : `/posts?page=${state.nextPage}`;
+      const url = authorUsername ? `/user/${authorUsername}/posts?page=${state.nextPage}` : `/posts?page=${state.nextPage}`;
 
-        const response = await api.get(url, {
-          headers: {
-            'Authorization': `Bearer ${PersistentStorage.session.token}`,
-          },
+      const response = await api.get(url, {
+        headers: {
+          'Authorization': `Bearer ${PersistentStorage.session.token}`,
+        },
+      });
+
+      const posts = (state.isRefreshing ? response.data.posts : [...state.posts, ...response.data.posts])
+        .map(post => {
+          if (!post.uuid) {
+            post.uuid = uuid();
+          }
+
+          return post;
         });
 
-        const posts = (state.isRefreshing ? response.data.posts : [...state.posts, ...response.data.posts])
-          .map(post => {
-            if (!post.uuid) {
-              post.uuid = uuid();
-            }
-
-            return post;
-          });
-
-        setState({
-          isLastPage: response.data.isLastPage,
-          isLoading: false,
-          isLoadingNext: false,
-          isRefreshing: false,
-          nextPage: state.nextPage + 1,
-          posts,
-        });
-      }
+      setState({
+        isLastPage: response.data.isLastPage,
+        isLoading: false,
+        isLoadingNext: false,
+        isRefreshing: false,
+        nextPage: state.nextPage + 1,
+        posts,
+      });
     }
 
-    loadPosts();
+    if (!state.isLastPage && (state.isLoading || state.isLoadingNext || state.isRefreshing)) {
+      loadPosts();
+    }
   }, [authorUsername, state]);
 
   return (
@@ -177,8 +177,8 @@ function PostList({ authorUsername, navigation }) {
 }
 
 PostList.propTypes = {
-  authorUsername: PropTypes.string,
   navigation: PropTypes.object.isRequired,
+  authorUsername: PropTypes.string,
 };
 
 export { PostList };

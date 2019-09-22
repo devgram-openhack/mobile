@@ -14,24 +14,28 @@ function AboutPage({ navigation }) {
       name: 'W_K.O',
       specialization: 'Design',
       url: 'https://github.com/WKO8',
+      username: 'WKO8',
     },
     {
       avatar: 'https://avatars2.githubusercontent.com/u/55169953?s=460&v=4',
       name: 'João Oliveira',
       specialization: 'Business / Design',
       url: 'https://github.com/joaofrancaoliveira',
+      username: 'joaofrancaoliveira',
     },
     {
       avatar: 'https://avatars1.githubusercontent.com/u/48861311?s=96&v=4',
       name: 'Moretti',
       specialization: 'Back-End Developer',
       url: 'https://github.com/morettigustavo',
+      username: 'morettigustavo',
     },
     {
       avatar: 'https://avatars0.githubusercontent.com/u/25509361?s=96&v=4',
       name: 'Rafael Gomes',
       specialization: 'Front-End Developer',
       url: 'https://github.com/rafaelgssa',
+      username: 'rafaelgssa',
     },
   ];
 
@@ -54,7 +58,7 @@ function AboutPage({ navigation }) {
 
                   <View style={commonStyle.infoRight}>
                     <View>
-                      <Text style={commonStyle.infoTitle}>{creator.name}</Text>
+                      <Text style={commonStyle.infoTitle}>{`${creator.name} (@${creator.username})`}</Text>
 
                       <Text style={commonStyle.infoSubtitle}>{creator.specialization}</Text>
                     </View>
@@ -66,7 +70,7 @@ function AboutPage({ navigation }) {
         }
 
         <TouchableOpacity
-          onPress={() => Linking.openURL('https://producthunt.com/')}
+          onPress={() => Linking.openURL('https://www.producthunt.com/posts/devgram')}
           style={commonStyle.buttonLarge}
         >
           <Text style={commonStyle.buttonText}>RATE US</Text>
