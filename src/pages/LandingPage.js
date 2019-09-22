@@ -14,10 +14,10 @@ import { commonStyle } from '../styles/Common.style';
 function LandingPage({ navigation }) {
   useEffect(() => {
     async function checkLoggedIn() {
-      const session = await PersistentStorage.getSession();
+      await PersistentStorage.loadSession();
 
-      if (session.token) {
-        navigation.navigate('MainPage', { session });
+      if (PersistentStorage.session.token) {
+        navigation.navigate('MainPage');
       } else {
         navigation.navigate('AuthPage');
       }

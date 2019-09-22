@@ -6,6 +6,7 @@ import uuid from 'uuid/v4';
 
 import { api } from '../services/api';
 import { EventEmitter } from '../services/EventEmitter';
+import { PersistentStorage } from '../services/PersistentStorage';
 
 import { Post } from './Post';
 
@@ -14,8 +15,6 @@ import { sizes } from '../styles/sizes';
 import { commonStyle } from '../styles/Common.style';
 
 function PostList({ authorUsername, navigation }) {
-  const session = navigation.getParam('session');
-
   const [state, setState] = useState({
     isLastPage: false,
     isLoading: true,
@@ -109,7 +108,9 @@ function PostList({ authorUsername, navigation }) {
         const url = authorUsername ? `/user/${authorUsername}/posts?page=${state.nextPage}` : `/posts?page=${state.nextPage}`;
 
         const response = await api.get(url, {
-          'Authorization': `Bearer ${session.token}`,
+          headers: {
+            'Authorization': `Bearer ${PersistentStorage.session.token}`,
+          },
         });
 
         const posts = (state.isRefreshing ? response.data.posts : [...state.posts, ...response.data.posts])
@@ -133,7 +134,7 @@ function PostList({ authorUsername, navigation }) {
     }
 
     loadPosts();
-  }, [authorUsername, state, session]);
+  }, [authorUsername, state]);
 
   return (
     state.isLoading ? (

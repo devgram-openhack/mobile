@@ -1,24 +1,34 @@
 import React from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import PropTypes from 'prop-types';
 
-import { postStyle } from '../styles/Post.style';
+import { commonStyle } from '../styles/Common.style';
 
 function Team({ navigation, team }) {
-  const session = navigation.getParam('session');
-
   return (
-    <View style={postStyle.container}>
+    <View style={commonStyle.card}>
       <TouchableOpacity
         onPress={() => navigation.navigate('TeamPage', {
           hackathon: team.hackathon,
-          session,
-          team: Object.assign({}, team),
+          team,
         })}
       >
-        <Text style={postStyle.title}>{team.title || `Team ${team.id}`}</Text>
+        <View style={commonStyle.info}>
+          {
+            team.avatar ? (
+              <Image source={{ uri: team.avatar }} style={commonStyle.infoAvatarImage} />
+            ) : (
+              <Icon name='account-circle' style={commonStyle.infoAvatarIcon} />
+            )
+          }
 
-        <Text style={postStyle.subtitle}>{team.hackathon.title}</Text>
+          <View style={commonStyle.infoRight}>
+            <Text style={commonStyle.infoTitleLarge}>{team.name || `Team ${team.id}`}</Text>
+          </View>
+        </View>
+
+        <Text style={commonStyle.cardSubtitle}>{team.hackathon.name}</Text>
       </TouchableOpacity>
     </View>
   );

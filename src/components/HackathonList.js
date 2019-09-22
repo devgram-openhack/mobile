@@ -4,6 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import PropTypes from 'prop-types';
 
 import { api } from '../services/api';
+import { PersistentStorage } from '../services/PersistentStorage';
 
 import { Hackathon } from './Hackathon';
 
@@ -12,8 +13,6 @@ import { sizes } from '../styles/sizes';
 import { commonStyle } from '../styles/Common.style';
 
 function HackathonList({ navigation }) {
-  const session = navigation.getParam('session');
-
   const [state, setState] = useState({
     hackathons: [],
     isLastPage: false,
@@ -43,7 +42,9 @@ function HackathonList({ navigation }) {
     async function loadHackathons() {
       if (!state.isLastPage && (state.isLoading || state.isLoadingNext || state.isRefreshing)) {
         const response = await api.get(`/hackathons?page=${state.nextPage}`, {
-          'Authorization': `Bearer ${session.token}`,
+          headers: {
+            'Authorization': `Bearer ${PersistentStorage.session.token}`,
+          },
         });
 
         setState({
@@ -58,7 +59,7 @@ function HackathonList({ navigation }) {
     }
 
     loadHackathons();
-  }, [state, session]);
+  }, [state]);
 
   return (
     state.isLoading ? (

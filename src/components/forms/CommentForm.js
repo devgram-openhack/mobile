@@ -5,19 +5,20 @@ import PropTypes from 'prop-types';
 
 import { api } from '../../services/api';
 import { EventEmitter } from '../../services/EventEmitter';
+import { PersistentStorage } from '../../services/PersistentStorage';
 
 import { colors } from '../../styles/colors';
 import { sizes } from '../../styles/sizes';
 import { commonStyle } from '../../styles/Common.style';
 
-function CommentForm({ navigation, post }) {
-  const session = navigation.getParam('session');
-
+function CommentForm({ post }) {
   async function handleComment(values, formikActions) {
     Keyboard.dismiss();
 
     const response = await api.post(`/post/${post.id}/comments`, values, {
-      'Authorization': `Bearer ${session.token}`,
+      headers: {
+        'Authorization': `Bearer ${PersistentStorage.session.token}`,
+      },
     });
 
     if (response.data.success) {
@@ -99,7 +100,6 @@ function CommentForm({ navigation, post }) {
 }
 
 CommentForm.propTypes = {
-  navigation: PropTypes.object.isRequired,
   post: PropTypes.object.isRequired,
 };
 

@@ -19,7 +19,7 @@ const EventEmitter = {
     return {
       unsubscribe: () => {
         if (this.events[event]) {
-          this.events[event] = this.events[event].filter(cb => cb !== callback);
+          this.events[event] = this.events[event].filter(subscribedCallback => subscribedCallback !== callback);
         }
       },
     };

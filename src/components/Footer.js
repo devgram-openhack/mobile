@@ -6,24 +6,22 @@ import PropTypes from 'prop-types';
 import { footerStyle } from '../styles/Footer.style';
 
 function Footer({ navigation }) {
-  const session = navigation.getParam('session');
-
   return (
     <View style={footerStyle.container}>
       <TouchableOpacity
-        onPress={() => navigation.navigate('HackathonsPage', { session })}
+        onPress={() => navigation.navigate('HackathonsPage')}
       >
         <Icon name='code' style={footerStyle.icon} />
       </TouchableOpacity>
 
       <TouchableOpacity
-        onPress={() => navigation.navigate('NewPostPage', { session })}
+        onPress={() => navigation.navigate('NewPostPage')}
       >
         <Icon name='add-circle' style={footerStyle.icon} />
       </TouchableOpacity>
 
       <TouchableOpacity
-        onPress={() => navigation.navigate('TeamsPage', { session })}
+        onPress={() => navigation.navigate('TeamsPage')}
       >
         <Icon name='people' style={footerStyle.icon} />
       </TouchableOpacity>

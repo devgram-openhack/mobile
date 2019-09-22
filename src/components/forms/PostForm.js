@@ -7,6 +7,7 @@ import Swiper from 'react-native-swiper';
 
 import { api } from '../../services/api';
 import { EventEmitter } from '../../services/EventEmitter';
+import { PersistentStorage } from '../../services/PersistentStorage';
 
 import { colors } from '../../styles/colors';
 import { sizes } from '../../styles/sizes';
@@ -17,19 +18,19 @@ function PostForm({ navigation, post }) {
     post = {};
   }
 
-  const session = navigation.getParam('session');
-
   async function handlePost(values, formikActions) {
     Keyboard.dismiss();
 
     const [method, url] = post.id ? ['patch', `/post/${post.id}`] : ['post', '/posts'];
 
     const response = await api[method](url, values, {
-      'Authorization': `Bearer ${session.token}`,
+      headers: {
+        'Authorization': `Bearer ${PersistentStorage.session.token}`,
+      },
     });
 
     if (response.data.success) {
-      navigation.navigate('MainPage', { session });
+      navigation.navigate('MainPage');
 
       if (post.id) {
         EventEmitter.dispatch('edit-post', response.data.post);
@@ -107,7 +108,7 @@ function PostForm({ navigation, post }) {
                 <Swiper showsButtons={values.images.length > 1}>
                   {
                     values.images.map((image, index) => (
-                      <Image key={index} source={{ uri: image.uri }} style={commonStyle.formFieldImage} />
+                      <Image key={index} source={{ uri: image.uri }} style={commonStyle.formFieldSwiperImage} />
                     ))
                   }
                 </Swiper>

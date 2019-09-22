@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import Toast from 'react-native-simple-toast';
 
 import { api } from '../services/api';
+import { PersistentStorage } from '../services/PersistentStorage';
 
 import { Page } from './Page';
 import { Header } from '../components/Header';
@@ -16,7 +17,6 @@ import { commonStyle } from '../styles/Common.style';
 import { profilePageStyle } from '../styles/ProfilePage.style';
 
 function ProfilePage({ navigation }) {
-  const session = navigation.getParam('session');
   const username = navigation.getParam('username');
 
   const [state, setState] = useState({
@@ -27,7 +27,9 @@ function ProfilePage({ navigation }) {
   useEffect(() => {
     async function loadUser() {
       const response = await api.get(`/user/${username}`, {
-        'Authorization': `Bearer ${session.token}`,
+        headers: {
+          'Authorization': `Bearer ${PersistentStorage.session.token}`,
+        },
       });
 
       if (response.data.success) {
@@ -43,7 +45,7 @@ function ProfilePage({ navigation }) {
     }
 
     loadUser();
-  }, [navigation, session, username]);
+  }, [navigation, username]);
 
   return (
     <Page>

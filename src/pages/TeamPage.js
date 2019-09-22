@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import PropTypes from 'prop-types';
-import Toast from 'react-native-simple-toast';
 
 import { api } from '../services/api';
+import { EventEmitter } from '../services/EventEmitter';
+import { PersistentStorage } from '../services/PersistentStorage';
 
 import { Page } from './Page';
 import { Header } from '../components/Header';
@@ -13,50 +14,56 @@ import { User } from '../components/User';
 import { colors } from '../styles/colors';
 import { sizes } from '../styles/sizes';
 import { commonStyle } from '../styles/Common.style';
-import { postStyle } from '../styles/Post.style';
-import { profilePageStyle } from '../styles/ProfilePage.style';
 import { teamPageStyle } from '../styles/TeamPage.style';
 
 function TeamPage({ navigation }) {
   const hackathon = navigation.getParam('hackathon');
-  const session = navigation.getParam('session');
-  const teamDetails = navigation.getParam('teamDetails');
+  const teamDetails = navigation.getParam('team');
 
   const [state, setState] = useState({
-    isEditing: false,
     isLoading: !teamDetails,
     team: teamDetails,
   });
 
-  async function editTeamTitle() {
-    const data = {
-      title: state.team.title,
-    };
+  useEffect(() => {
+    const subscribers = [];
 
-    const response = await api.patch(`/team/${state.team.id}`, data, {
-      'Authorization': `Bearer ${session.token}`,
-    });
-
-    if (!response.data.success) {
-      Toast.show(response.data.message);
+    function updateTeam(updatedTeam) {
+      if (state.team.id === updatedTeam.id) {
+        setState({
+          ...state,
+          team: Object.assign({}, state.team, updatedTeam),
+        });
+      }
     }
 
-    setState({
-      isEditing: false,
-      isLoading: false,
-      team: response.data.team,
-    });
-  }
+    function subscribe() {
+      subscribers.push(
+        EventEmitter.subscribe('edit-team', updateTeam),
+      );
+    }
+
+    function unsubscribe() {
+      for (const subscriber of subscribers) {
+        subscriber.unsubscribe();
+      }
+    }
+
+    subscribe();
+
+    return unsubscribe;
+  }, [state]);
 
   useEffect(() => {
     async function loadTeam() {
-      if (!state.team) {
-        const response = await api.get(`/hackathon/${hackathon.id}/team`, {
-          'Authorization': `Bearer ${session.token}`,
+      if (typeof state.team === 'undefined') {
+        const response = await api.get(`/me/hackathon/${hackathon.id}/team`, {
+          headers: {
+            'Authorization': `Bearer ${PersistentStorage.session.token}`,
+          },
         });
 
         setState({
-          isEditing: false,
           isLoading: false,
           team: response.data.team,
         });
@@ -64,7 +71,7 @@ function TeamPage({ navigation }) {
     }
 
     loadTeam();
-  }, [hackathon, session, state]);
+  }, [hackathon, state]);
 
   return (
     <Page>
@@ -77,59 +84,67 @@ function TeamPage({ navigation }) {
           </View>
         ) : (
           state.team ? (
-            <View style={profilePageStyle.container}>
-              {
-                state.isEditing ? (
-                  <View style={teamPageStyle.team}>
-                    <TextInput
-                      autoCompleteType='off'
-                      onChangeText={text => setState({
-                        ...state,
-                        team: Object.assign({}, state.team, {
-                          title: text,
-                        }),
-                      })}
-                      style={commonStyle.formFieldInputSmall}
-                      value={state.team.title}
-                    />
+            <View style={teamPageStyle.container}>
+              <View style={commonStyle.infoFull}>
+                {
+                  state.team.avatar ? (
+                    <Image source={{ uri: state.team.avatar }} style={commonStyle.infoAvatarImage} />
+                  ) : (
+                    <Icon name='account-circle' style={commonStyle.infoAvatarIcon} />
+                  )
+                }
 
-                    <TouchableOpacity
-                      onPress={() => editTeamTitle()}
-                    >
-                      <Icon name={'check'} style={teamPageStyle.editTeamIcon} />
-                    </TouchableOpacity>
+                <View style={commonStyle.infoRight}>
+                  <View>
+                    <Text style={commonStyle.infoTitleLarge}>{state.team.name || `Team ${state.team.id}`}</Text>
                   </View>
-                ) : (
-                  <View style={teamPageStyle.team}>
-                    <Text style={teamPageStyle.teamTitle}>{state.team.title || `Team ${state.team.id}`}</Text>
 
+                  <View style={commonStyle.infoActions}>
                     <TouchableOpacity
-                      onPress={() => setState({
-                        ...state,
-                        isEditing: true,
+                      onPress={() => navigation.navigate('EditTeamPage', {
+                        team: state.team,
                       })}
                     >
                       <Icon name='edit' style={teamPageStyle.editTeamIcon} />
                     </TouchableOpacity>
                   </View>
+                </View>
+              </View>
 
-                )
-              }
-
-              <Text style={teamPageStyle.hackathon}>{state.team.hackathon.title}</Text>
+              <Text style={commonStyle.cardSubtitleFull}>{state.team.hackathon.name}</Text>
 
               <View style={commonStyle.containerScrollable}>
                 {
                   state.team.members.map(member => (
-                    <View key={member.id} style={postStyle.container}>
+                    <View key={member.id} style={commonStyle.card}>
                       <User navigation={navigation} user={member} />
                     </View>
                   ))
                 }
+
+                {
+                  state.team.members.length < state.team.hackathon.maxMembersPerTeam && (
+                    <TouchableOpacity
+                      onPress={() => navigation.navigate('TeamMatchPage')}
+                      style={commonStyle.buttonLarge}
+                    >
+                      <Text style={commonStyle.buttonText}>FIND TEAMMATES</Text>
+                    </TouchableOpacity>
+                  )
+                }
               </View>
             </View>
           ) : (
-            null
+            <View style={commonStyle.containerCentered}>
+              <Text style={commonStyle.containerCenteredText}>You do not have a team for this hackathon yet.</Text>
+
+              <TouchableOpacity
+                onPress={() => navigation.navigate('TeamMatchPage')}
+                style={commonStyle.buttonLarge}
+              >
+                <Text style={commonStyle.buttonText}>FIND TEAMMATES</Text>
+              </TouchableOpacity>
+            </View>
           )
         )
       }

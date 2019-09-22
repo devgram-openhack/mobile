@@ -4,21 +4,21 @@ import PropTypes from 'prop-types';
 import Swiper from 'react-native-swiper';
 
 import { api } from '../services/api';
+import { PersistentStorage } from '../services/PersistentStorage';
 
 import { commonStyle } from '../styles/Common.style';
-import { postStyle } from '../styles/Post.style';
 
 function Hackathon({ details, navigation }) {
-  const session = navigation.getParam('session');
-
   const [hackathon, setHackathon] = useState(details);
 
   async function handleHackathon() {
     if (hackathon.isParticipating) {
-      navigation.navigate('TeamPage', { hackathon, session });
+      navigation.navigate('TeamPage', { hackathon });
     } else {
-      const response = await api.post(`/hackathon/${hackathon.id}/join`, {
-        'Authorization': `Bearer ${session.token}`
+      const response = await api.post(`/hackathon/${hackathon.id}/join`, null, {
+        headers: {
+          'Authorization': `Bearer ${PersistentStorage.session.token}`,
+        },
       });
 
       if (response.data.success) {
@@ -31,16 +31,16 @@ function Hackathon({ details, navigation }) {
   }
 
   return (
-    <View style={postStyle.container}>
-      <Text style={postStyle.title}>{hackathon.title}</Text>
+    <View style={commonStyle.card}>
+      <Text style={commonStyle.cardTitle}>{hackathon.name}</Text>
 
       {
         hackathon.images.length > 0 && (
-          <View style={postStyle.swiper}>
+          <View style={commonStyle.cardSwiper}>
             <Swiper showsButtons={hackathon.images.length > 1}>
               {
                 hackathon.images.map((image, index) => (
-                  <Image key={index} source={{ uri: image }} style={postStyle.image} />
+                  <Image key={index} source={{ uri: image }} style={commonStyle.cardSwiperImage} />
                 ))
               }
             </Swiper>
@@ -48,10 +48,10 @@ function Hackathon({ details, navigation }) {
         )
       }
 
-      <Text style={postStyle.description}>{hackathon.description}</Text>
+      <Text style={commonStyle.cardDescription}>{hackathon.description}</Text>
 
       <TouchableOpacity
-        disabled={!hackathon.isOpen}
+        disabled={!hackathon.isParticipating && !hackathon.isOpen}
         onPress={handleHackathon}
         style={commonStyle.buttonLarge}
       >

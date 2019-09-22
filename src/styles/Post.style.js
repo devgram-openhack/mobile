@@ -4,55 +4,6 @@ import { colors } from './colors';
 import { sizes } from './sizes';
 
 const postStyle = StyleSheet.create({
-  container: {
-    backgroundColor: colors.card,
-    marginBottom: sizes['16'],
-    width: sizes['332'],
-  },
-
-  title: {
-    backgroundColor: colors.bar,
-    color: colors.main,
-    fontSize: sizes['16'],
-    fontWeight: 'bold',
-    padding: sizes['8'],
-  },
-
-  subtitle: {
-    backgroundColor: colors.input,
-    color: colors.text,
-    fontWeight: 'bold',
-    padding: sizes['8'],
-  },
-
-  swiper: {
-    backgroundColor: colors.bar,
-    height: sizes['200v'],
-    padding: sizes['8'],
-  },
-
-  image: {
-    height: sizes['200v'],
-    resizeMode: 'cover',
-  },
-
-  description: {
-    color: colors.text,
-    padding: sizes['8'],
-  },
-
-  footer: {
-    alignItems: 'center',
-    backgroundColor: colors.bar,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: sizes['8'],
-  },
-
-  actions: {
-    flexDirection: 'row',
-  },
-
   likeAction: {
     marginRight: sizes['24'],
   },

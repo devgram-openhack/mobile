@@ -1,15 +1,21 @@
 import AsyncStorage from '@react-native-community/async-storage';
 
 const PersistentStorage = {
-  async getSession() {
-    return JSON.parse((await AsyncStorage.getItem('session')) || '{}');
+  session: {},
+
+  async loadSession() {
+    this.session = JSON.parse((await AsyncStorage.getItem('session')) || '{}');
   },
 
-  async setSession(session) {
-    await AsyncStorage.setItem('session', JSON.stringify(session));
+  async beginSession(session) {
+    this.session = session;
+
+    await AsyncStorage.setItem('session', JSON.stringify(this.session));
   },
 
-  async removeSession() {
+  async endSession() {
+    this.session = {};
+
     await AsyncStorage.removeItem('session');
   },
 };

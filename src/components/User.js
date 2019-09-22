@@ -4,38 +4,38 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import Modal from 'react-native-modal';
 import PropTypes from 'prop-types';
 
+import { PersistentStorage } from '../services/PersistentStorage';
+
 import { commonStyle } from '../styles/Common.style';
 import { userStyle } from '../styles/User.style';
 
 function User({ navigation, showDescription, user }) {
-  const session = navigation.getParam('session');
-
   const [isModalVisible, setModalVisible] = useState(false);
 
   const userView = (
-    <View style={showDescription ? userStyle.containerWithDescription : userStyle.container}>
+    <View style={showDescription ? commonStyle.infoFull : commonStyle.info}>
       {
         user.avatar ? (
-          <Image source={{ uri: user.avatar }} style={userStyle.avatarImage} />
+          <Image source={{ uri: user.avatar }} style={commonStyle.infoAvatarImage} />
         ) : (
-          <Icon name='account-circle' style={userStyle.avatarIcon} />
+          <Icon name='account-circle' style={commonStyle.infoAvatarIcon} />
         )
       }
 
-      <View style={userStyle.containerRight}>
+      <View style={commonStyle.infoRight}>
         <View>
-          <Text style={userStyle.name}>{`${user.name} (@${user.username})`}</Text>
+          <Text style={commonStyle.infoTitle}>{`${user.name} (@${user.username})`}</Text>
 
-          <Text style={userStyle.specialization}>{user.specialization}</Text>
+          <Text style={commonStyle.infoSubtitle}>{user.specialization}</Text>
         </View>
 
         {
           showDescription && (
-            <View style={userStyle.actions}>
+            <View style={commonStyle.infoActions}>
               {
-                user.username === session.username && (
+                user.username === PersistentStorage.session.username && (
                   <TouchableOpacity
-                    onPress={() => navigation.navigate('EditProfilePage', { session, user })}
+                    onPress={() => navigation.navigate('EditProfilePage', { user })}
                   >
                     <Icon name='edit' style={userStyle.editIcon} />
                   </TouchableOpacity>
@@ -62,7 +62,6 @@ function User({ navigation, showDescription, user }) {
         ) : (
           <TouchableOpacity
             onPress={() => navigation.navigate('ProfilePage', {
-              session,
               username: user.username,
             })}
           >
