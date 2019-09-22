@@ -18,23 +18,21 @@ function UserForm({ navigation, user }) {
     user = {};
   }
 
-  const session = navigation.getParam('session');
-
   async function handleUser(values, formikActions) {
     Keyboard.dismiss();
 
-    const [method, url] = user.id ? ['patch', `/user/${user.username}`] : ['post', '/register'];
+    const [method, url] = user.id ? ['patch', '/me'] : ['post', '/register'];
 
-    const response = await api[method](url, values, session && {
-      'Authorization': `Bearer ${session.token}`,
+    const response = await api[method](url, values, PersistentStorage.session && {
+      headers: {
+        'Authorization': `Bearer ${PersistentStorage.session.token}`,
+      },
     });
 
     if (response.data.success) {
-      const { session } = response.data;
+      await PersistentStorage.beginSession(PersistentStorage.session);
 
-      await PersistentStorage.setSession(session);
-
-      navigation.navigate('MainPage', { session });
+      navigation.navigate('MainPage');
 
       if (user.id) {
         EventEmitter.dispatch('edit-user', response.data.user);

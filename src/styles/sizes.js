@@ -13,6 +13,7 @@ const sizes = {
   '56': moderateScale(56),
   '64': moderateScale(64),
   '150': moderateScale(150),
+  '200': moderateScale(200),
   '200v': verticalScale(200),
   '250': moderateScale(250),
   '332': moderateScale(332),

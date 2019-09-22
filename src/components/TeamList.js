@@ -8,20 +8,20 @@ import { api } from '../services/api';
 import { EventEmitter } from '../services/EventEmitter';
 import { PersistentStorage } from '../services/PersistentStorage';
 
-import { Post } from './Post';
+import { Team } from './Team';
 
 import { colors } from '../styles/colors';
 import { sizes } from '../styles/sizes';
 import { commonStyle } from '../styles/Common.style';
 
-function PostList({ authorUsername, navigation }) {
+function TeamList({ navigation }) {
   const [state, setState] = useState({
     isLastPage: false,
     isLoading: true,
     isLoadingNext: false,
     isRefreshing: false,
     nextPage: 1,
-    posts: [],
+    teams: [],
   });
 
   function refreshPage() {
@@ -43,51 +43,23 @@ function PostList({ authorUsername, navigation }) {
   useEffect(() => {
     const subscribers = [];
 
-    function updatePost(updatedPost) {
+    function updateTeam(updatedTeam) {
       setState({
         ...state,
-        posts: state.posts.map(post => {
-          if (post.id === updatedPost.id) {
-            post = Object.assign({}, post, updatedPost);
-            post.uuid = uuid();
+        teams: state.teams.map(team => {
+          if (team.id === updatedTeam.id) {
+            team = Object.assign({}, team, updatedTeam);
+            team.uuid = uuid();
           }
 
-          return post;
+          return team;
         }),
-      });
-    }
-
-    function updateAuthor(updatedAuthor) {
-      setState({
-        ...state,
-        posts: state.posts.map(post => {
-          if (post.author.id === updatedAuthor.id) {
-            post.author = Object.assign({}, post.author, updatedAuthor);
-            post.uuid = uuid();
-          }
-
-          return post;
-        }),
-      });
-    }
-
-    function refreshPage() {
-      setState({
-        ...state,
-        isLastPage: false,
-        isRefreshing: true,
-        nextPage: 1,
       });
     }
 
     function subscribe() {
       subscribers.push(
-        EventEmitter.subscribe('new-post', refreshPage),
-        EventEmitter.subscribe('edit-post', updatePost),
-        EventEmitter.subscribe('edit-user', updateAuthor),
-        EventEmitter.subscribe('like', updatePost),
-        EventEmitter.subscribe('dislike', updatePost),
-        EventEmitter.subscribe('new-comment', updatePost),
+        EventEmitter.subscribe('edit-team', updateTeam),
       );
     }
 
@@ -103,23 +75,21 @@ function PostList({ authorUsername, navigation }) {
   }, [state]);
 
   useEffect(() => {
-    async function loadPosts() {
+    async function loadTeams() {
       if (!state.isLastPage && (state.isLoading || state.isLoadingNext || state.isRefreshing)) {
-        const url = authorUsername ? `/user/${authorUsername}/posts?page=${state.nextPage}` : `/posts?page=${state.nextPage}`;
-
-        const response = await api.get(url, {
+        const response = await api.get(`/me/teams?page=${state.nextPage}`, {
           headers: {
             'Authorization': `Bearer ${PersistentStorage.session.token}`,
           },
         });
 
-        const posts = (state.isRefreshing ? response.data.posts : [...state.posts, ...response.data.posts])
-          .map(post => {
-            if (!post.uuid) {
-              post.uuid = uuid();
+        const teams = (state.isRefreshing ? response.data.teams : [...state.teams, ...response.data.teams])
+          .map(team => {
+            if (!team.uuid) {
+              team.uuid = uuid();
             }
 
-            return post;
+            return team;
           });
 
         setState({
@@ -128,13 +98,13 @@ function PostList({ authorUsername, navigation }) {
           isLoadingNext: false,
           isRefreshing: false,
           nextPage: state.nextPage + 1,
-          posts,
+          teams,
         });
       }
     }
 
-    loadPosts();
-  }, [authorUsername, state]);
+    loadTeams();
+  }, [state]);
 
   return (
     state.isLoading ? (
@@ -142,17 +112,17 @@ function PostList({ authorUsername, navigation }) {
         <ActivityIndicator color={colors.main} size={sizes['40']} />
       </View>
     ) : (
-      state.posts.length > 0 ? (
+      state.teams.length > 0 ? (
         <FlatList
           contentContainerStyle={commonStyle.containerScrollable}
-          data={state.posts}
+          data={state.teams}
           keyExtractor={item => item.uuid}
           onRefresh={refreshPage}
           onEndReached={loadNextPage}
           onEndReachedThreshold={0.5}
           refreshing={state.isRefreshing}
           renderItem={({ item }) => (
-            <Post navigation={navigation} post={item} showAuthor={!authorUsername} />
+            <Team navigation={navigation} team={item} />
           )}
         />
       ) : (
@@ -168,7 +138,7 @@ function PostList({ authorUsername, navigation }) {
           <View style={commonStyle.containerCentered}>
             <Icon name='highlight-off' style={commonStyle.containerCenteredIcon} />
 
-            <Text style={commonStyle.containerCenteredText}>{authorUsername ? 'This user has no posts. Scroll up to refresh the page.' : 'There are no posts. Scroll up to refresh the page or use the button at the footer to create a new post.'}</Text>
+            <Text style={commonStyle.containerCenteredText}>{'You are not in any teams. Go to the hackathons page to join hackathons / teams.'}</Text>
           </View>
         </ScrollView>
       )
@@ -176,9 +146,8 @@ function PostList({ authorUsername, navigation }) {
   );
 }
 
-PostList.propTypes = {
-  authorUsername: PropTypes.string,
+TeamList.propTypes = {
   navigation: PropTypes.object.isRequired,
 };
 
-export { PostList };
+export { TeamList };

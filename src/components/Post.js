@@ -7,6 +7,7 @@ import uuid from 'uuid/v4';
 
 import { api } from '../services/api';
 import { EventEmitter } from '../services/EventEmitter';
+import { PersistentStorage } from '../services/PersistentStorage';
 import { utils } from '../utils';
 
 import { User } from './User';
@@ -16,12 +17,9 @@ import { Comment } from './Comment';
 import { colors } from '../styles/colors';
 import { sizes } from '../styles/sizes';
 import { commonStyle } from '../styles/Common.style';
-import { commentStyle } from '../styles/Comment.style';
 import { postStyle } from '../styles/Post.style';
 
 function Post({ navigation, post, showAuthor, showComments }) {
-  const session = navigation.getParam('session');
-
   const [state, setState] = useState({
     comments: [],
     isLastPage: false,
@@ -33,8 +31,10 @@ function Post({ navigation, post, showAuthor, showComments }) {
   });
 
   async function handleLike() {
-    const response = await api.post(`/post/${state.post.id}/likes`, {
-      'Authorization': `Bearer ${session.token}`,
+    const response = await api.post(`/post/${state.post.id}/likes`, null, {
+      headers: {
+        'Authorization': `Bearer ${PersistentStorage.session.token}`,
+      },
     });
 
     if (response.data.success) {
@@ -50,8 +50,10 @@ function Post({ navigation, post, showAuthor, showComments }) {
   }
 
   async function handleDislike() {
-    const response = await api.post(`/post/${state.post.id}/dislikes`, {
-      'Authorization': `Bearer ${session.token}`,
+    const response = await api.post(`/post/${state.post.id}/dislikes`, null, {
+      headers: {
+        'Authorization': `Bearer ${PersistentStorage.session.token}`,
+      },
     });
 
     if (response.data.success) {
@@ -136,16 +138,20 @@ function Post({ navigation, post, showAuthor, showComments }) {
       }
     }
 
-    subscribe();
+    if (showComments) {
+      subscribe();
 
-    return unsubscribe;
-  }, [state]);
+      return unsubscribe;
+    }
+  }, [showComments, state]);
 
   useEffect(() => {
     async function loadComments() {
       if (!state.isLastPage && (state.isLoading || state.isLoadingNext || state.isRefreshing)) {
         const response = await api.get(`/post/${state.post.id}/comments?page=${state.nextPage}`, {
-          'Authorization': `Bearer ${session.token}`,
+          headers: {
+            'Authorization': `Bearer ${PersistentStorage.session.token}`,
+          },
         });
 
         const comments = (state.isRefreshing ? response.data.comments : [...state.comments, ...response.data.comments])
@@ -172,10 +178,10 @@ function Post({ navigation, post, showAuthor, showComments }) {
     if (showComments) {
       loadComments();
     }
-  }, [state, session, showComments]);
+  }, [state, showComments]);
 
   const container = (
-    <View style={postStyle.container}>
+    <View style={commonStyle.card}>
       {
         showAuthor && (
           <User navigation={navigation} user={state.post.author} />
@@ -185,19 +191,18 @@ function Post({ navigation, post, showAuthor, showComments }) {
       <TouchableOpacity
         onPress={() => navigation.navigate('PostPage', {
           post: state.post,
-          session,
         })}
       >
-        <Text numberOfLines={showComments ? null : 2} style={postStyle.title}>{state.post.title}</Text>
+        <Text numberOfLines={showComments ? null : 2} style={commonStyle.cardTitle}>{state.post.title}</Text>
       </TouchableOpacity>
 
       {
         state.post.images.length > 0 && (
-          <View style={postStyle.swiper}>
+          <View style={commonStyle.cardSwiper}>
             <Swiper showsButtons={state.post.images.length > 1}>
               {
                 state.post.images.map((image, index) => (
-                  <Image key={index} source={{ uri: image }} style={postStyle.image} />
+                  <Image key={index} source={{ uri: image }} style={commonStyle.cardSwiperImage} />
                 ))
               }
             </Swiper>
@@ -208,14 +213,13 @@ function Post({ navigation, post, showAuthor, showComments }) {
       <TouchableOpacity
         onPress={() => navigation.navigate('PostPage', {
           post: state.post,
-          session,
         })}
       >
-        <Text numberOfLines={showComments ? null : 3} style={postStyle.description}>{state.post.description}</Text>
+        <Text numberOfLines={showComments ? null : 3} style={commonStyle.cardDescription}>{state.post.description}</Text>
       </TouchableOpacity>
 
-      <View style={postStyle.footer}>
-        <View style={postStyle.actions}>
+      <View style={commonStyle.cardFooter}>
+        <View style={commonStyle.cardActions}>
           <TouchableOpacity
             onPress={handleLike}
             style={postStyle.likeAction}
@@ -234,13 +238,12 @@ function Post({ navigation, post, showAuthor, showComments }) {
           </TouchableOpacity>
         </View>
 
-        <View style={postStyle.actions}>
+        <View style={commonStyle.cardActions}>
           {
-            showComments && state.post.author.username === session.username && (
+            showComments && state.post.author.username === PersistentStorage.session.username && (
               <TouchableOpacity
                 onPress={() => navigation.navigate('EditPostPage', {
                   post: state.post,
-                  session,
                 })}
                 style={postStyle.editPostAction}
               >
@@ -252,7 +255,6 @@ function Post({ navigation, post, showAuthor, showComments }) {
           <TouchableOpacity
             onPress={() => navigation.navigate('PostPage', {
               post: state.post,
-              session,
             })}
           >
             <Icon name='comment' style={postStyle.commentActionIcon} />
@@ -265,7 +267,7 @@ function Post({ navigation, post, showAuthor, showComments }) {
       {
         showComments && (
           <View style={postStyle.comments}>
-            <CommentForm navigation={navigation} post={state.post} />
+            <CommentForm post={state.post} />
 
             {
               state.isLoading ? (
@@ -276,9 +278,12 @@ function Post({ navigation, post, showAuthor, showComments }) {
                     <Comment key={comment.uuid} comment={comment} navigation={navigation} />
                   ))
                 ) : (
-                  <View style={commentStyle.container}>
-                    <Text style={commentStyle.description}>There are no comments. Scroll up to refresh the page or create a new comment above.</Text>
-                  </View>
+                  <Comment
+                    comment={{
+                      description: 'There are no comments. Scroll up to refresh the page or create a new comment above.',
+                    }}
+                    navigation={navigation}
+                  />
                 )
               )
             }

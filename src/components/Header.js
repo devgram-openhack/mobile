@@ -3,11 +3,12 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import PropTypes from 'prop-types';
 
+import { PersistentStorage } from '../services/PersistentStorage';
+
 import { headerStyle } from '../styles/Header.style';
 
 function Header({ navigation }) {
-  const session = navigation.getParam('session');
-  const { username } = session;
+  const { username } = PersistentStorage.session;
 
   return (
     <View style={headerStyle.container}>
@@ -18,13 +19,13 @@ function Header({ navigation }) {
       </TouchableOpacity>
 
       <TouchableOpacity
-        onPress={() => navigation.navigate('MainPage', { session })}
+        onPress={() => navigation.navigate('MainPage')}
       >
         <Text style={headerStyle.logo}>DEVGRAM</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
-        onPress={() => navigation.navigate('ProfilePage', { session, username })}
+        onPress={() => navigation.navigate('ProfilePage', { username })}
       >
         <Icon name='account-circle' style={headerStyle.accountIcon} />
       </TouchableOpacity>

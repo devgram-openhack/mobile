@@ -3,23 +3,20 @@ import PropTypes from 'prop-types';
 
 import { Page } from './Page';
 import { Header } from '../components/Header';
-import { PostList } from '../components/PostList';
-import { Footer } from '../components/Footer';
+import { HackathonList } from '../components/HackathonList';
 
-function MainPage({ navigation }) {
+function HackathonsPage({ navigation }) {
   return (
     <Page>
       <Header navigation={navigation} />
 
-      <PostList navigation={navigation} />
-
-      <Footer navigation={navigation} />
+      <HackathonList navigation={navigation} />
     </Page>
   );
 }
 
-MainPage.propTypes = {
+HackathonsPage.propTypes = {
   navigation: PropTypes.object.isRequired,
 };
 
-export { MainPage };
+export { HackathonsPage };

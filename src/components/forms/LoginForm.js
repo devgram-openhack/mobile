@@ -17,11 +17,9 @@ function LoginForm({ navigation }) {
     const response = await api.post('/login', values);
 
     if (response.data.success) {
-      const { session } = response.data;
+      await PersistentStorage.beginSession(response.data.session);
 
-      await PersistentStorage.setSession(session);
-
-      navigation.navigate('MainPage', { session });
+      navigation.navigate('MainPage');
     } else {
       formikActions.setSubmitting(false);
       formikActions.setStatus(response.data.message);

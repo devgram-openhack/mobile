@@ -12,14 +12,14 @@ import { commonStyle } from '../../styles/Common.style';
 
 function LogoutForm({ navigation }) {
   async function handleLogout(values, formikActions) {
-    const session = await PersistentStorage.getSession();
-
     const response = await api.post('/logout', null, {
-      'Authorization': `Bearer ${session.token}`,
+      headers: {
+        'Authorization': `Bearer ${PersistentStorage.session.token}`,
+      },
     });
 
     if (response.data.success) {
-      await PersistentStorage.removeSession();
+      await PersistentStorage.endSession();
 
       navigation.navigate('AuthPage');
     } else {
