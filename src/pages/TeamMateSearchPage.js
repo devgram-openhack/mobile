@@ -100,6 +100,7 @@ function TeamMateSearchPage({ navigation }) {
           <TextInput
             autoCapitalize='none'
             autoCompleteType='off'
+            autoCorrect={false}
             editable={!state.isSearching}
             onChangeText={text => setState({
               ...state,

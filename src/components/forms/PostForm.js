@@ -87,6 +87,7 @@ function PostForm({ navigation, post }) {
               <Text style={commonStyle.formFieldLabel}>Title (*)</Text>
 
               <TextInput
+                autoCapitalize='words'
                 autoCompleteType='off'
                 onChangeText={handleChange('title')}
                 placeholder='The title of your project / idea...'

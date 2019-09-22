@@ -140,7 +140,9 @@ function UserForm({ navigation, user }) {
               <Text style={commonStyle.formFieldLabel}>Username (*)</Text>
 
               <TextInput
+                autoCapitalize='none'
                 autoCompleteType='off'
+                autoCorrect={false}
                 onChangeText={handleChange('username')}
                 placeholder='johndoe'
                 style={commonStyle.formFieldInput}
@@ -158,7 +160,9 @@ function UserForm({ navigation, user }) {
               <Text style={commonStyle.formFieldLabel}>Name (*)</Text>
 
               <TextInput
+                autoCapitalize='words'
                 autoCompleteType='off'
+                autoCorrect={false}
                 onChangeText={handleChange('name')}
                 placeholder='John Doe'
                 style={commonStyle.formFieldInput}
@@ -176,6 +180,7 @@ function UserForm({ navigation, user }) {
               <Text style={commonStyle.formFieldLabel}>Specialization (*)</Text>
 
               <TextInput
+                autoCapitalize='words'
                 autoCompleteType='off'
                 onChangeText={handleChange('specialization')}
                 placeholder='Front-End Developer'
@@ -214,7 +219,9 @@ function UserForm({ navigation, user }) {
               <Text style={commonStyle.formFieldLabel}>Email (*)</Text>
 
               <TextInput
+                autoCapitalize='none'
                 autoCompleteType='email'
+                autoCorrect={false}
                 keyboardType='email-address'
                 onChangeText={handleChange('email')}
                 placeholder='johndoe@example.com'
@@ -233,7 +240,9 @@ function UserForm({ navigation, user }) {
               <Text style={commonStyle.formFieldLabel}>Password (*)</Text>
 
               <TextInput
+                autoCapitalize='none'
                 autoCompleteType='off'
+                autoCorrect={false}
                 onChangeText={handleChange('password')}
                 placeholder='********'
                 secureTextEntry={true}
@@ -252,7 +261,9 @@ function UserForm({ navigation, user }) {
               <Text style={commonStyle.formFieldLabel}>Confirm Password (*)</Text>
 
               <TextInput
+                autoCapitalize='none'
                 autoCompleteType='off'
+                autoCorrect={false}
                 onChangeText={handleChange('confirmPassword')}
                 placeholder='********'
                 secureTextEntry={true}

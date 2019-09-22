@@ -91,6 +91,7 @@ function TeamForm({ navigation, team }) {
               <Text style={commonStyle.formFieldLabel}>Name</Text>
 
               <TextInput
+                autoCapitalize='words'
                 autoCompleteType='off'
                 onChangeText={handleChange('name')}
                 placeholder='MyTeamName'
