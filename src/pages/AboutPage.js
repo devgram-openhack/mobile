@@ -58,7 +58,7 @@ function AboutPage({ navigation }) {
 
                   <View style={commonStyle.infoRight}>
                     <View>
-                      <Text style={commonStyle.infoTitle}>{`${creator.name} (@${creator.username}`}</Text>
+                      <Text style={commonStyle.infoTitle}>{`${creator.name} (@${creator.username})`}</Text>
 
                       <Text style={commonStyle.infoSubtitle}>{creator.specialization}</Text>
                     </View>
@@ -70,7 +70,7 @@ function AboutPage({ navigation }) {
         }
 
         <TouchableOpacity
-          onPress={() => Linking.openURL('https://producthunt.com/')}
+          onPress={() => Linking.openURL('https://www.producthunt.com/posts/devgram')}
           style={commonStyle.buttonLarge}
         >
           <Text style={commonStyle.buttonText}>RATE US</Text>
