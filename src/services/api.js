@@ -1123,7 +1123,7 @@ const api = {
               dislikes: [...databasePostAuthor.dislikes],
               hackathons: [...databasePostAuthor.hackathons],
               teams: [...databasePostAuthor.teams],
-              ignoredUsers: [...databasePostAuthor.ignoredUsers],
+              ignoredUsers: cloneIgnoredUsers(databasePostAuthor.ignoredUsers),
             }),
             images: [...databasePost.images],
           }),
@@ -1159,7 +1159,7 @@ const api = {
             dislikes: [...databaseUser.dislikes],
             hackathons: [...databaseUser.hackathons],
             teams: [...databaseUser.teams],
-            ignoredUsers: [...databaseUser.ignoredUsers],
+            ignoredUsers: cloneIgnoredUsers(databaseUser.ignoredUsers),
           }),
         },
       };
@@ -1211,7 +1211,7 @@ const api = {
                 dislikes: [...databaseMember.dislikes],
                 hackathons: [...databaseMember.hackathons],
                 teams: [...databaseMember.teams],
-                ignoredUsers: [...databaseMember.ignoredUsers],
+                ignoredUsers: cloneIgnoredUsers(databaseMember.ignoredUsers),
               });
             }),
           }),
