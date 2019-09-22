@@ -645,7 +645,7 @@ const api = {
 
           const missing = databaseTeam ? databaseHackathon.maxMembersPerTeam - databaseTeam.members.length : 1;
 
-          if (missing > 0) {
+          if ((!databaseTeam || !databaseTeam.members.includes(userId)) && missing > 0) {
             let score = 0;
 
             const specialization = databaseUser.specialization.toLowerCase();
