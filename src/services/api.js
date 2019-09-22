@@ -11,7 +11,7 @@ const DATABASE = {
       specialization: 'Designer',
       description: 'I\'m from California, 22 years old, and have 3-year experience with UX design.',
       email: 'carl@gmail.com',
-      passwordHash: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+      password: 'curl',
       likes: ['2'],
       dislikes: ['1'],
       hackathons: ['0', '2'],
@@ -28,7 +28,7 @@ const DATABASE = {
       specialization: 'Developer',
       description: 'I develop with Javascript.',
       email: 'henry@gmail.com',
-      passwordHash: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+      password: 'whisperers',
       likes: [],
       dislikes: [],
       hackathons: ['2'],
@@ -45,7 +45,7 @@ const DATABASE = {
       specialization: 'Mentor',
       description: 'I mentor projects when it comes to the design.',
       email: 'carol@gmail.com',
-      passwordHash: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+      password: 'lookattheflowers',
       likes: [],
       dislikes: [],
       hackathons: [],
@@ -62,7 +62,7 @@ const DATABASE = {
       specialization: 'Designer',
       description: '',
       email: 'enid@gmail.com',
-      passwordHash: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+      password: 'jss123',
       likes: [],
       dislikes: [],
       hackathons: ['2'],
@@ -79,7 +79,7 @@ const DATABASE = {
       specialization: 'Developer (React)',
       description: 'I develop with React and a little bit of React Native.',
       email: 'glenn@gmail.com',
-      passwordHash: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+      password: 'lucillebye',
       likes: [],
       dislikes: [],
       hackathons: ['2'],
@@ -402,17 +402,21 @@ const api = {
       for (const id in DATABASE.users) {
         const databaseUser = DATABASE.users[id];
 
+        const user = Object.assign({}, databaseUser, {
+          likes: [...databaseUser.likes],
+          dislikes: [...databaseUser.dislikes],
+          hackathons: [...databaseUser.hackathons],
+          teams: [...databaseUser.teams],
+          ignoredUsers: cloneIgnoredUsers(databaseUser.ignoredUsers),
+        });
+
+        delete user.password;
+
         if (databaseUser.username.toLowerCase() === username) {
           return {
             data: {
               success: true,
-              user: Object.assign({}, databaseUser, {
-                likes: [...databaseUser.likes],
-                dislikes: [...databaseUser.dislikes],
-                hackathons: [...databaseUser.hackathons],
-                teams: [...databaseUser.teams],
-                ignoredUsers: cloneIgnoredUsers(databaseUser.ignoredUsers),
-              }),
+              user,
             },
           };
         }
@@ -776,10 +780,12 @@ const api = {
     if (matches) {
       // SimpleToast.show('Logging in...');
 
+      const usernameOrEmail = data.usernameOrEmail.toLowerCase();
+
       for (const id in DATABASE.users) {
         const databaseUser = DATABASE.users[id];
 
-        if (databaseUser.username === data.usernameOrEmail || databaseUser.email === data.usernameOrEmail) {
+        if ((databaseUser.username.toLowerCase() === usernameOrEmail || databaseUser.email.toLowerCase() === usernameOrEmail) && databaseUser.password === data.password) {
           return {
             data: {
               success: true,
@@ -822,6 +828,8 @@ const api = {
       const now = Date.now();
 
       const newUserId = Object.keys(DATABASE.users).length.toString();
+
+      delete data.confirmPassword;
 
       DATABASE.users[newUserId] = {
         ...data,
@@ -1140,6 +1148,8 @@ const api = {
 
       // SimpleToast.show(`Editing profile ${userId}...`);
 
+      delete data.confirmPassword;
+
       const databaseUser = Object.assign({}, DATABASE.users[userId], data, {
         avatar: data.avatar.uri,
         modifiedTimestamp: Date.now(),
@@ -1174,10 +1184,12 @@ const api = {
 
       // SimpleToast.show(`Editing team name ${teamId}...`);
 
+      const name = data.name.toLowerCase();
+
       for (const id in DATABASE.teams) {
         const databaseTeam = DATABASE.teams[id];
 
-        if (databaseTeam.name.toLowerCase() === data.name.toLowerCase()) {
+        if (databaseTeam.name.toLowerCase() === name) {
           return {
             data: {
               success: false,
