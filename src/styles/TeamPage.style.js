@@ -8,6 +8,11 @@ const teamPageStyle = StyleSheet.create({
     color: colors.text,
     fontSize: sizes['24'],
   },
+
+  kickMemberIcon: {
+    color: colors.error,
+    fontSize: sizes['24'],
+  },
 });
 
 export { teamPageStyle };

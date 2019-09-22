@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ConfirmDialog } from 'react-native-simple-dialogs';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import PropTypes from 'prop-types';
+import SimpleToast from 'react-native-simple-toast';
 
 import { api } from '../services/api';
 import { EventEmitter } from '../services/EventEmitter';
@@ -18,11 +20,14 @@ import { teamPageStyle } from '../styles/TeamPage.style';
 
 function TeamPage({ navigation }) {
   const hackathon = navigation.getParam('hackathon');
-  const teamDetails = navigation.getParam('team');
+  const team = navigation.getParam('team');
 
   const [state, setState] = useState({
-    isLoading: !teamDetails,
-    team: teamDetails,
+    isLeavingTeam: false,
+    isLoading: !team,
+    isRefreshing: false,
+    memberToKick: null,
+    team,
   });
 
   useEffect(() => {
@@ -52,10 +57,19 @@ function TeamPage({ navigation }) {
       });
     }
 
+    function refreshPage() {
+      setState({
+        ...state,
+        isRefreshing: true,
+        memberToKick: null,
+      });
+    }
+
     function subscribe() {
       subscribers.push(
         EventEmitter.subscribe('edit-team', updateTeam),
         EventEmitter.subscribe('edit-user', updateMember),
+        EventEmitter.subscribe('update-team', refreshPage),
       );
     }
 
@@ -72,22 +86,70 @@ function TeamPage({ navigation }) {
 
   useEffect(() => {
     async function loadTeam() {
-      if (typeof state.team === 'undefined') {
-        const response = await api.get(`/me/hackathon/${hackathon.id}/team`, {
-          headers: {
-            'Authorization': `Bearer ${PersistentStorage.session.token}`,
-          },
-        });
+      const response = await api.get(`/me/hackathon/${hackathon.id}/team`, {
+        headers: {
+          'Authorization': `Bearer ${PersistentStorage.session.token}`,
+        },
+      });
 
-        setState({
-          isLoading: false,
-          team: response.data.team,
-        });
-      }
+      setState({
+        isLoading: false,
+        isRefreshing: false,
+        team: response.data.team,
+      });
     }
 
-    loadTeam();
+    if (typeof state.team === 'undefined' || state.isRefreshing) {
+      loadTeam();
+    }
   }, [hackathon, state]);
+
+  async function kickMember() {
+    const response = await api.delete(`/user/${state.memberToKick}/hackathon/${hackathon.id}/team`, {
+      headers: {
+        'Authorization': `Bearer ${PersistentStorage.session.token}`,
+      },
+    });
+
+    if (response.data.success) {
+      refreshPage();
+    } else {
+      SimpleToast.show(response.data.message);
+
+      setState({
+        ...state,
+        memberToKick: null,
+      });
+    }
+  }
+
+  async function leaveTeam() {
+    const response = await api.delete(`/me/hackathon/${hackathon.id}/team`, {
+      headers: {
+        'Authorization': `Bearer ${PersistentStorage.session.token}`,
+      },
+    });
+
+    if (response.data.success) {
+      navigation.goBack();
+
+      EventEmitter.dispatch('update-team');
+    } else {
+      SimpleToast.show(response.data.message);
+
+      setState({
+        ...state,
+        isLeavingTeam: false,
+      });
+    }
+  }
+
+  function refreshPage() {
+    setState({
+      ...state,
+      isRefreshing: true,
+    });
+  }
 
   return (
     <Page>
@@ -129,11 +191,35 @@ function TeamPage({ navigation }) {
 
               <Text style={commonStyle.cardSubtitleFull}>{state.team.hackathon.name}</Text>
 
-              <View style={commonStyle.containerScrollable}>
+              <ScrollView
+                contentContainerStyle={commonStyle.containerScrollable}
+                refreshControl={(
+                  <RefreshControl
+                    onRefresh={refreshPage}
+                    refreshing={state.isRefreshing}
+                  />
+                )}
+              >
                 {
                   state.team.members.map(member => (
                     <View key={member.id} style={commonStyle.card}>
                       <User navigation={navigation} user={member} />
+
+                      {
+                        member.username !== PersistentStorage.session.username && (
+                          <View style={commonStyle.cardSubtitle}>
+                            <TouchableOpacity
+                              onPress={() => setState({
+                                ...state,
+                                memberToKick: member.id,
+                              })}
+                              style={commonStyle.buttonSmall}
+                            >
+                              <Text style={commonStyle.buttonText}>KICK MEMBER</Text>
+                            </TouchableOpacity>
+                          </View>
+                        )
+                      }
                     </View>
                   ))
                 }
@@ -141,32 +227,91 @@ function TeamPage({ navigation }) {
                 {
                   state.team.hackathon.isOpen && state.team.members.length < state.team.hackathon.maxMembersPerTeam && (
                     <TouchableOpacity
-                      onPress={() => navigation.navigate('TeamMateSearchPage', {
-                        hackathon: state.team.hackathon,
-                        team: state.team,
-                      })}
+                      onPress={() => navigation.navigate('TeamMateSearchPage', { hackathon })}
                       style={commonStyle.buttonLarge}
                     >
                       <Text style={commonStyle.buttonText}>FIND TEAMMATES</Text>
                     </TouchableOpacity>
                   )
                 }
-              </View>
+
+                <TouchableOpacity
+                  onPress={() => setState({
+                    ...state,
+                    isLeavingTeam: true,
+                  })}
+                  style={commonStyle.buttonLarge}
+                >
+                  <Text style={commonStyle.buttonText}>LEAVE TEAM</Text>
+                </TouchableOpacity>
+              </ScrollView>
             </View>
           ) : (
-            <View style={commonStyle.containerCentered}>
-              <Text style={commonStyle.containerCenteredText}>You do not have a team for this hackathon yet.</Text>
+            <ScrollView
+              contentContainerStyle={commonStyle.containerScrollable}
+              refreshControl={(
+                <RefreshControl
+                  onRefresh={refreshPage}
+                  refreshing={state.isRefreshing}
+                />
+              )}
+            >
+              <View style={commonStyle.containerCentered}>
+                <Text style={commonStyle.containerCenteredText}>You do not have a team for this hackathon yet.</Text>
 
-              <TouchableOpacity
-                onPress={() => navigation.navigate('TeamMateSearchPage', { hackathon })}
-                style={commonStyle.buttonLarge}
-              >
-                <Text style={commonStyle.buttonText}>FIND TEAMMATES</Text>
-              </TouchableOpacity>
-            </View>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('TeamMateSearchPage', { hackathon })}
+                  style={commonStyle.buttonLarge}
+                >
+                  <Text style={commonStyle.buttonText}>FIND TEAMMATES</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
           )
         )
       }
+
+      <ConfirmDialog
+        title='Confirm Dialog'
+        message='Are you sure you want to kick this member?'
+        visible={!!state.memberToKick}
+        onTouchOutside={() => setState({
+          ...state,
+          memberToKick: null,
+        })}
+        positiveButton={{
+          title: 'YES',
+          onPress: kickMember,
+        }}
+        negativeButton={{
+          title: 'NO',
+          onPress: () => setState({
+            ...state,
+            memberToKick: null,
+          })
+        }}
+      />
+
+      <ConfirmDialog
+        title='Confirm Dialog'
+        message='Are you sure you want to leave this team?'
+        visible={state.isLeavingTeam}
+        onTouchOutside={() => setState({
+          ...state,
+          isLeavingTeam: false,
+        })}
+        positiveButton={{
+          title: 'YES',
+          onPress: leaveTeam,
+        }}
+        negativeButton={{
+          title: 'NO',
+          onPress: () => setState({
+            ...state,
+            isLeavingTeam: false,
+          })
+        }}
+      />
     </Page>
   );
 }

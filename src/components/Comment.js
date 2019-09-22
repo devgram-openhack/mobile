@@ -28,8 +28,8 @@ function Comment({ navigation, comment }) {
 }
 
 Comment.propTypes = {
-  comment: PropTypes.object.isRequired,
   navigation: PropTypes.object.isRequired,
+  comment: PropTypes.object.isRequired,
 };
 
 export { Comment };

@@ -16,7 +16,7 @@ const DATABASE = {
       dislikes: ['1'],
       hackathons: ['0', '2'],
       teams: ['0', '2'],
-      ignoredUsers: [],
+      ignoredUsers: {},
       createdTimestamp: 1569103194496,
       modifiedTimestamp: 1569103194496,
     },
@@ -33,7 +33,7 @@ const DATABASE = {
       dislikes: [],
       hackathons: ['2'],
       teams: ['1'],
-      ignoredUsers: [],
+      ignoredUsers: {},
       createdTimestamp: 1569103194496,
       modifiedTimestamp: 1569103194496,
     },
@@ -50,7 +50,41 @@ const DATABASE = {
       dislikes: [],
       hackathons: [],
       teams: [],
-      ignoredUsers: [],
+      ignoredUsers: {},
+      createdTimestamp: 1569103194496,
+      modifiedTimestamp: 1569103194496,
+    },
+    '3': {
+      id: '3',
+      avatar: 'https://avatars0.githubusercontent.com/u/25509364?s=460',
+      name: 'Enid',
+      username: 'enid',
+      specialization: 'Designer',
+      description: '',
+      email: 'enid@gmail.com',
+      passwordHash: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+      likes: [],
+      dislikes: [],
+      hackathons: ['2'],
+      teams: [],
+      ignoredUsers: {},
+      createdTimestamp: 1569103194496,
+      modifiedTimestamp: 1569103194496,
+    },
+    '4': {
+      id: '4',
+      avatar: 'https://avatars0.githubusercontent.com/u/25509365?s=460',
+      name: 'Glenn',
+      username: 'glenn',
+      specialization: 'Developer (React)',
+      description: 'I develop with React and a little bit of React Native.',
+      email: 'glenn@gmail.com',
+      passwordHash: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+      likes: [],
+      dislikes: [],
+      hackathons: ['2'],
+      teams: ['0'],
+      ignoredUsers: {},
       createdTimestamp: 1569103194496,
       modifiedTimestamp: 1569103194496,
     },
@@ -158,7 +192,7 @@ const DATABASE = {
       hackathon: '2',
       avatar: '',
       name: 'Bookcademers',
-      members: ['0'],
+      members: ['0', '4'],
     },
     '1': {
       id: '1',
@@ -175,7 +209,26 @@ const DATABASE = {
       members: ['0'],
     },
   },
+  invites: {
+    '0': {
+      id: '0',
+      hackathon: '2',
+      from: '1',
+      to: '0',
+      status: 'pending',
+    },
+  },
 };
+
+function cloneIgnoredUsers(ignoredUsers) {
+  const clone = {};
+
+  for (const id in ignoredUsers) {
+    clone[id] = [...ignoredUsers[id]];
+  }
+
+  return clone;
+}
 
 const api = {
   async get(url, config) {
@@ -201,7 +254,7 @@ const api = {
             dislikes: [...author.dislikes],
             hackathons: [...author.hackathons],
             teams: [...author.teams],
-            ignoredUsers: [...author.ignoredUsers],
+            ignoredUsers: cloneIgnoredUsers(author.ignoredUsers),
           }),
           images: [...databasePost.images],
           liked: loggedInUser.likes.includes(id),
@@ -220,7 +273,7 @@ const api = {
 
       return {
         data: {
-          sucess: true,
+          success: true,
           isLastPage,
           posts: posts.slice(startSlice, endSlice),
         },
@@ -250,7 +303,7 @@ const api = {
               dislikes: [...author.dislikes],
               hackathons: [...author.hackathons],
               teams: [...author.teams],
-              ignoredUsers: [...author.ignoredUsers],
+              ignoredUsers: cloneIgnoredUsers(author.ignoredUsers),
             }),
             images: [...databasePost.images],
             liked: loggedInUser.likes.includes(id),
@@ -292,7 +345,7 @@ const api = {
           dislikes: [...databasePostAuthor.dislikes],
           hackathons: [...databasePostAuthor.hackathons],
           teams: [...databasePostAuthor.teams],
-          ignoredUsers: [...databasePostAuthor.ignoredUsers],
+          ignoredUsers: cloneIgnoredUsers(databasePostAuthor.ignoredUsers),
         }),
         images: [...databasePost.images],
         liked: databasePostAuthor.likes.includes(postId),
@@ -313,7 +366,7 @@ const api = {
               dislikes: [...author.dislikes],
               hackathons: [...author.hackathons],
               teams: [...author.teams],
-              ignoredUsers: [...author.ignoredUsers],
+              ignoredUsers: cloneIgnoredUsers(author.ignoredUsers),
             }),
           }));
         }
@@ -342,14 +395,14 @@ const api = {
     matches = url.match(/^\/user\/(.+)/);
 
     if (matches) {
-      const username = matches[1];
+      const username = matches[1].toLowerCase();
 
       // SimpleToast.show(`Getting user ${username}...`);
 
       for (const id in DATABASE.users) {
         const databaseUser = DATABASE.users[id];
 
-        if (databaseUser.username === username) {
+        if (databaseUser.username.toLowerCase() === username) {
           return {
             data: {
               success: true,
@@ -358,7 +411,7 @@ const api = {
                 dislikes: [...databaseUser.dislikes],
                 hackathons: [...databaseUser.hackathons],
                 teams: [...databaseUser.teams],
-                ignoredUsers: [...databaseUser.ignoredUsers],
+                ignoredUsers: cloneIgnoredUsers(databaseUser.ignoredUsers),
               }),
             },
           };
@@ -419,7 +472,7 @@ const api = {
 
       return {
         data: {
-          sucess: true,
+          success: true,
           isLastPage,
           hackathons: hackathons.slice(startSlice, endSlice),
         },
@@ -454,7 +507,7 @@ const api = {
               dislikes: [...databaseMember.dislikes],
               hackathons: [...databaseMember.hackathons],
               teams: [...databaseMember.teams],
-              ignoredUsers: [...databaseMember.ignoredUsers],
+              ignoredUsers: cloneIgnoredUsers(databaseMember.ignoredUsers),
             });
           }),
         });
@@ -485,7 +538,7 @@ const api = {
 
       return {
         data: {
-          sucess: true,
+          success: true,
           isLastPage,
           teams: teams.slice(startSlice, endSlice),
         },
@@ -508,12 +561,16 @@ const api = {
       if (databaseTeam) {
         const databaseHackathon = DATABASE.hackathons[hackathonId];
 
+        const now = Date.now();
+
         return {
           data: {
             success: true,
             team: Object.assign({}, databaseTeam, {
               hackathon: Object.assign({}, databaseHackathon, {
                 images: [...databaseHackathon.images],
+                isOpen: now < databaseHackathon.endTimestamp,
+                isParticipating: true,
               }),
               members: databaseTeam.members.map(member => {
                 const databaseMember = DATABASE.users[member];
@@ -523,7 +580,7 @@ const api = {
                   dislikes: [...databaseMember.dislikes],
                   hackathons: [...databaseMember.hackathons],
                   teams: [...databaseMember.teams],
-                  ignoredUsers: [...databaseMember.ignoredUsers],
+                  ignoredUsers: cloneIgnoredUsers(databaseMember.ignoredUsers),
                 });
               }),
             }),
@@ -533,21 +590,23 @@ const api = {
 
       return {
         data: {
-          sucess: true,
+          success: true,
           team: null,
         },
       };
     }
 
-    // GET /hackathon/{id}/users?keywords={keywords}
+    // GET /hackathon/{id}/user?keywords={keywords}
     // Requires authentication
-    matches = url.match(/^\/hackathon\/(.+?)\/users\?keywords=(.+)/);
+    matches = url.match(/^\/hackathon\/(.+?)\/user\?keywords=(.*)/);
 
     if (matches) {
       if (!matches[2]) {
         return {
-          success: false,
-          message: 'No keywords!',
+          data: {
+            success: false,
+            message: 'No keywords!',
+          },
         };
       }
 
@@ -556,19 +615,37 @@ const api = {
       const userId = config.headers.Authorization.split('_')[1];
       const loggedInUser = DATABASE.users[userId];
 
-      // SimpleToast.show(`Getting users ${hackathonId} ${keywords.join(',')}...`);
+      // SimpleToast.show(`Getting user ${hackathonId} ${keywords.join(',')}...`);
 
       const databaseHackathon = DATABASE.hackathons[hackathonId];
+
+      const sentInvites = [];
+
+      for (const id in DATABASE.invites) {
+        const databaseInvite = DATABASE.invites[id];
+
+        if (databaseInvite.hackathon === hackathonId) {
+          if (databaseInvite.from === userId) {
+            sentInvites.push(databaseInvite.to);
+          } else if (databaseInvite.to === userId) {
+            sentInvites.push(databaseInvite.from);
+          }
+        }
+      }
 
       const results = [];
 
       for (const id in DATABASE.users) {
         const databaseUser = DATABASE.users[id];
 
-        if (!loggedInUser.ignoredUsers.includes(id) && databaseUser.hackathons.includes(hackathonId)) {
+        if (id !== userId && databaseUser.hackathons.includes(hackathonId) && !sentInvites.includes(id) && (!loggedInUser.ignoredUsers[hackathonId] || !loggedInUser.ignoredUsers[hackathonId].includes(id))) {
+          // User is participating in hackathon + has not been sent an invite yet + is not ignored
+
           const databaseTeam = databaseUser.teams.map(teamId => DATABASE.teams[teamId]).filter(team => team.hackathon === hackathonId)[0];
 
-          if (!databaseTeam || databaseTeam.members.length < databaseHackathon.maxMembersPerTeam) {
+          const missing = databaseTeam ? databaseHackathon.maxMembersPerTeam - databaseTeam.members.length : 1;
+
+          if (missing > 0) {
             let score = 0;
 
             const specialization = databaseUser.specialization.toLowerCase();
@@ -585,7 +662,7 @@ const api = {
             if (score > 0) {
               results.push({
                 score,
-                team: Object.assign({}, databaseTeam, {
+                team: databaseTeam && Object.assign({}, databaseTeam, {
                   hackathon: Object.assign({}, databaseHackathon, {
                     images: [...databaseHackathon.images],
                   }),
@@ -597,16 +674,17 @@ const api = {
                       dislikes: [...databaseMember.dislikes],
                       hackathons: [...databaseMember.hackathons],
                       teams: [...databaseMember.teams],
-                      ignoredUsers: [...databaseMember.ignoredUsers],
+                      ignoredUsers: cloneIgnoredUsers(databaseMember.ignoredUsers),
                     });
                   }),
+                  missing,
                 }),
                 user: Object.assign({}, databaseUser, {
                   likes: [...databaseUser.likes],
                   dislikes: [...databaseUser.dislikes],
                   hackathons: [...databaseUser.hackathons],
                   teams: [...databaseUser.teams],
-                  ignoredUsers: [...databaseUser.ignoredUsers],
+                  ignoredUsers: cloneIgnoredUsers(databaseUser.ignoredUsers),
                 }),
               });
             }
@@ -619,7 +697,71 @@ const api = {
       return {
         data: {
           success: true,
-          results,
+          result: results[0],
+        },
+      };
+    }
+
+    // GET /me/invite
+    // Requires authentication
+    matches = url.match(/^\/me\/invite/);
+
+    if (matches) {
+      // SimpleToast.show('Getting invite for logged in user...');
+
+      const userId = config.headers.Authorization.split('_')[1];
+
+      for (const id in DATABASE.invites) {
+        const databaseInvite = DATABASE.invites[id];
+
+        if (databaseInvite.to === userId && databaseInvite.status === 'pending') {
+          const databaseHackathon = DATABASE.hackathons[databaseInvite.hackathon];
+          const databaseUser = DATABASE.users[databaseInvite.from];
+          const databaseTeam = databaseUser.teams.map(teamId => DATABASE.teams[teamId]).filter(team => team.hackathon === databaseInvite.hackathon)[0];
+
+          const missing = databaseTeam ? databaseHackathon.maxMembersPerTeam - databaseTeam.members.length : 1;
+
+          return {
+            data: {
+              success: true,
+              invite: Object.assign({}, databaseInvite, {
+                hackathon: Object.assign({}, databaseHackathon, {
+                  images: [...databaseHackathon.images],
+                }),
+                from: Object.assign({}, databaseUser, {
+                  likes: [...databaseUser.likes],
+                  dislikes: [...databaseUser.dislikes],
+                  hackathons: [...databaseUser.hackathons],
+                  teams: [...databaseUser.teams],
+                  ignoredUsers: cloneIgnoredUsers(databaseUser.ignoredUsers),
+                }),
+                team: databaseTeam && Object.assign({}, databaseTeam, {
+                  hackathon: Object.assign({}, databaseHackathon, {
+                    images: [...databaseHackathon.images],
+                  }),
+                  members: databaseTeam.members.map(member => {
+                    const databaseMember = DATABASE.users[member];
+
+                    return Object.assign({}, databaseMember, {
+                      likes: [...databaseMember.likes],
+                      dislikes: [...databaseMember.dislikes],
+                      hackathons: [...databaseMember.hackathons],
+                      teams: [...databaseMember.teams],
+                      ignoredUsers: cloneIgnoredUsers(databaseMember.ignoredUsers),
+                    });
+                  }),
+                  missing,
+                }),
+              }),
+            },
+          };
+        }
+      }
+
+      return {
+        data: {
+          success: true,
+          invite: null,
         },
       };
     }
@@ -667,7 +809,7 @@ const api = {
       for (const id in DATABASE.users) {
         const databaseUser = DATABASE.users[id];
 
-        if (databaseUser.username === data.username || databaseUser.email === data.email) {
+        if (databaseUser.username.toLowerCase() === data.username.toLowerCase() || databaseUser.email.toLowerCase() === data.email.toLowerCase()) {
           return {
             data: {
               success: false,
@@ -689,7 +831,7 @@ const api = {
         dislikes: [],
         hackathons: [],
         teams: [],
-        ignoredUsers: [],
+        ignoredUsers: {},
         createdTimestamp: now,
         modifiedTimestamp: now,
       };
@@ -873,6 +1015,81 @@ const api = {
         },
       };
     }
+
+    // POST /hackathon/{id}/user/{id}/invite
+    // Requires authentication
+    matches = url.match(/^\/hackathon\/(.+?)\/user\/(.+?)\/invite/);
+
+    if (matches) {
+      const hackathonId = matches[1];
+      const fromId = config.headers.Authorization.split('_')[1];
+      const toId = matches[2];
+
+      // SimpleToast.show(`Sending invite to user ${hackathon} ${toId}...`);
+
+      for (const id in DATABASE.invites) {
+        const databaseInvite = DATABASE.invites[id];
+
+        if (databaseInvite.hackathon === hackathonId && databaseInvite.from === fromId && databaseInvite.to === toId) {
+          return {
+            data: {
+              success: false,
+              message: 'Invite already sent, try to refresh the page.',
+            },
+          };
+        }
+      }
+
+      const newInviteId = Object.keys(DATABASE.invites).length.toString();
+
+      DATABASE.invites[newInviteId] = {
+        id: newInviteId,
+        hackathon: hackathonId,
+        from: fromId,
+        to: toId,
+        status: 'pending',
+      };
+
+      return {
+        data: {
+          success: true,
+        },
+      };
+    }
+
+    // POST /hackathon/{id}/user/{id}/ignore
+    // Requires authentication
+    matches = url.match(/^\/hackathon\/(.+?)\/user\/(.+?)\/ignore/);
+
+    if (matches) {
+      const hackathonId = matches[1];
+      const userToIgnoreId = matches[2];
+      const userId = config.headers.Authorization.split('_')[1];
+      const loggedInUser = DATABASE.users[userId];
+
+      // SimpleToast.show(`Ignoring user ${hackathon} ${userToIgnoreId}...`);
+
+      if (!loggedInUser.ignoredUsers[hackathonId]) {
+        loggedInUser.ignoredUsers[hackathonId] = [];
+      }
+
+      if (loggedInUser.ignoredUsers[hackathonId].includes(userToIgnoreId)) {
+        return {
+          data: {
+            success: false,
+            message: 'User already ignored, try to refresh the page.',
+          },
+        };
+      }
+
+      loggedInUser.ignoredUsers[hackathonId].push(userToIgnoreId);
+
+      return {
+        data: {
+          success: true,
+        },
+      };
+    }
   },
 
   async patch(url, data, config) {
@@ -960,7 +1177,7 @@ const api = {
       for (const id in DATABASE.teams) {
         const databaseTeam = DATABASE.teams[id];
 
-        if (databaseTeam.name === data.name) {
+        if (databaseTeam.name.toLowerCase() === data.name.toLowerCase()) {
           return {
             data: {
               success: false,
@@ -1001,7 +1218,160 @@ const api = {
         },
       };
     }
+
+    // PATCH /invite/{id}
+    // Requires authentication
+    matches = url.match(/^\/invite\/(.+)/);
+
+    if (matches) {
+      const inviteId = matches[1];
+
+      // SimpleToast.show(`Modifying invite status ${inviteId}...`);
+
+      const databaseInvite = DATABASE.invites[inviteId];
+
+      let error = '';
+
+      if (data.status === 'accepted') {
+        const fromUser = DATABASE.users[databaseInvite.from];
+        const toUser = DATABASE.users[databaseInvite.to];
+        const databaseHackathon = DATABASE.hackathons[databaseInvite.hackathon];
+        const fromTeam = fromUser.teams.map(teamId => DATABASE.teams[teamId]).filter(team => team.hackathon === databaseInvite.hackathon)[0];
+        const toTeam = toUser.teams.map(teamId => DATABASE.teams[teamId]).filter(team => team.hackathon === databaseInvite.hackathon)[0];
+
+        if (toTeam && fromTeam) {
+          if ((fromTeam.members.length + toTeam.members.length) > databaseHackathon.maxMembersPerTeam) {
+            error = 'Oops! Merging both teams would exceed the maximum number of members in this hackathon.';
+          } else {
+            const newTeamId = Object.keys(DATABASE.teams).length.toString();
+
+            DATABASE.teams[newTeamId] = {
+              id: newTeamId,
+              hackathon: databaseInvite.hackathon,
+              avatar: toTeam.avatar || fromTeam.avatar,
+              name: toTeam.name || fromTeam.name,
+              members: [...toTeam.members, ...fromTeam.members],
+            };
+
+            toUser.teams = toUser.teams.filter(teamId => teamId !== toTeam.id);
+            toUser.teams.push(newTeamId);
+
+            fromUser.teams = fromUser.teams.filter(teamId => teamId !== fromTeam.id);
+            fromUser.teams.push(newTeamId);
+          }
+        } else if (toTeam) {
+          if ((toTeam.members.length + 1) > databaseHackathon.maxMembersPerTeam) {
+            error = 'Oops! Their team is already at the maximum number of members in this hackathon.';
+          } else {
+            toTeam.members.push(fromUser.id);
+
+            fromUser.teams.push(toTeam.id);
+          }
+        } else if (fromTeam) {
+          if ((fromTeam.members.length + 1) > databaseHackathon.maxMembersPerTeam) {
+            error = 'Oops! Your team is already at the maximum number of members in this hackathon.';
+          } else {
+            fromTeam.members.push(toUser.id);
+
+            toUser.teams.push(fromTeam.id);
+          }
+        } else {
+          const newTeamId = Object.keys(DATABASE.teams).length.toString();
+
+          DATABASE.teams[newTeamId] = {
+            id: newTeamId,
+            hackathon: databaseInvite.hackathon,
+            avatar: '',
+            name: '',
+            members: [fromUser.id, toUser.id],
+          };
+
+          fromUser.teams.push(newTeamId);
+          toUser.teams.push(newTeamId);
+        }
+      }
+
+      DATABASE.invites[inviteId].status = error ? 'expired' : data.status;
+
+      return {
+        data: {
+          success: !error,
+          message: error,
+        },
+      };
+    }
   },
+
+  async delete(url, config) {
+    let matches;
+
+    // DELETE /me/hackathon/{id}/team
+    // Requires authentication
+    matches = url.match(/^\/me\/hackathon\/(.+?)\/team/);
+
+    if (matches) {
+      const hackathonId = matches[1];
+      const userId = config.headers.Authorization.split('_')[1];
+      const loggedInUser = DATABASE.users[userId];
+
+      // SimpleToast.show(`Leaving team for logged in user for hackathon ${hackathonId}...`);
+
+      const databaseTeam = loggedInUser.teams.map(teamId => DATABASE.teams[teamId]).filter(team => team.hackathon === hackathonId)[0];
+
+      if (databaseTeam) {
+        databaseTeam.members = databaseTeam.members.filter(member => member !== userId);
+
+        loggedInUser.hackathons = loggedInUser.hackathons.filter(hackathon => hackathon !== hackathonId);
+        loggedInUser.teams = loggedInUser.teams.filter(team => team !== databaseTeam.id);
+      }
+
+      return {
+        data: {
+          success: true,
+        },
+      };
+    }
+
+    // DELETE /me/hackathon/{id}/team
+    // Requires authentication
+    matches = url.match(/^\/user\/(.+?)\/hackathon\/(.+?)\/team/);
+
+    if (matches) {
+      const userToDeleteId = matches[1];
+      const hackathonId = matches[2];
+
+      // SimpleToast.show(`Kicking team member for hackathon ${userToDeleteId} ${hackathonId}...`);
+
+      const userToDelete = DATABASE.users[userToDeleteId];
+
+      const userId = config.headers.Authorization.split('_')[1];
+      const loggedInUser = DATABASE.users[userId];
+
+      const databaseTeam = loggedInUser.teams.map(teamId => DATABASE.teams[teamId]).filter(team => team.hackathon === hackathonId)[0];
+
+      if (databaseTeam) {
+        if (!databaseTeam.members.includes(userToDeleteId)) {
+          return {
+            data: {
+              success: false,
+              message: 'User not in your team, unauthorized to kick.',
+            },
+          };
+        }
+
+        databaseTeam.members = databaseTeam.members.filter(member => member !== userToDeleteId);
+
+        userToDelete.hackathons = userToDelete.hackathons.filter(hackathon => hackathon !== hackathonId);
+        userToDelete.teams = userToDelete.teams.filter(team => team !== databaseTeam.id);
+      }
+
+      return {
+        data: {
+          success: true,
+        },
+      };
+    }
+  }
 };
 
 export { api };

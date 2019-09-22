@@ -67,9 +67,9 @@ function ProfilePage({ navigation }) {
           user: response.data.user,
         });
       } else {
-        SimpleToast.show(response.data.message);
-
         navigation.goBack();
+
+        SimpleToast.show(response.data.message);
       }
     }
 
@@ -87,9 +87,9 @@ function ProfilePage({ navigation }) {
           </View>
         ) : (
           <View style={commonStyle.containerFull}>
-            <User navigation={navigation} showDescription={true} user={state.user} />
+            <User navigation={navigation} user={state.user} showDescription={true} />
 
-            <PostList authorUsername={username} navigation={navigation} />
+            <PostList navigation={navigation} authorUsername={username} />
           </View>
         )
       }

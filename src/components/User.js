@@ -9,7 +9,7 @@ import { PersistentStorage } from '../services/PersistentStorage';
 import { commonStyle } from '../styles/Common.style';
 import { userStyle } from '../styles/User.style';
 
-function User({ navigation, showDescription, user }) {
+function User({ navigation, user, showDescription }) {
   const [isModalVisible, setModalVisible] = useState(false);
 
   const userView = (
@@ -92,8 +92,8 @@ function User({ navigation, showDescription, user }) {
 
 User.propTypes = {
   navigation: PropTypes.object.isRequired,
-  showDescription: PropTypes.bool,
   user: PropTypes.object.isRequired,
+  showDescription: PropTypes.bool,
 };
 
 export { User };

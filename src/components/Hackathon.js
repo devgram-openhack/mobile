@@ -8,7 +8,7 @@ import { PersistentStorage } from '../services/PersistentStorage';
 
 import { commonStyle } from '../styles/Common.style';
 
-function Hackathon({ details, navigation }) {
+function Hackathon({ navigation, details }) {
   const [hackathon, setHackathon] = useState(details);
 
   async function handleHackathon() {
@@ -62,8 +62,8 @@ function Hackathon({ details, navigation }) {
 }
 
 Hackathon.propTypes = {
-  details: PropTypes.object.isRequired,
   navigation: PropTypes.object.isRequired,
+  details: PropTypes.object.isRequired,
 };
 
 export { Hackathon };

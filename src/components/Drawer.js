@@ -25,6 +25,11 @@ function Drawer({ navigation }) {
       routeName: 'TeamsPage',
     },
     {
+      icon: 'email',
+      title: 'Pending Invites',
+      routeName: 'PendingInvitesPage',
+    },
+    {
       icon: 'info',
       title: 'About',
       routeName: 'AboutPage',
@@ -35,12 +40,6 @@ function Drawer({ navigation }) {
       routeName: 'LogoutPage',
     },
   ];
-
-  function handleItem(index) {
-    navigation.navigate(items[index].routeName);
-
-    setActiveIndex(index);
-  }
 
   useEffect(() => {
     function getActiveRouteName(navigationState) {
@@ -73,6 +72,12 @@ function Drawer({ navigation }) {
 
     updateActiveIndex();
   }, [items, navigation.state]);
+
+  function handleItem(index) {
+    navigation.navigate(items[index].routeName);
+
+    setActiveIndex(index);
+  }
 
   return (
     <SafeAreaView style={drawerStyle.container}>

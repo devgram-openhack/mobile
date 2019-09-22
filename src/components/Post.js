@@ -30,60 +30,6 @@ function Post({ navigation, post, showAuthor, showComments }) {
     post,
   });
 
-  async function handleLike() {
-    const response = await api.post(`/post/${state.post.id}/likes`, null, {
-      headers: {
-        'Authorization': `Bearer ${PersistentStorage.session.token}`,
-      },
-    });
-
-    if (response.data.success) {
-      setState({
-        ...state,
-        post: Object.assign({}, state.post, response.data.post),
-      });
-
-      if (showComments) {
-        EventEmitter.dispatch('like', response.data.post);
-      }
-    }
-  }
-
-  async function handleDislike() {
-    const response = await api.post(`/post/${state.post.id}/dislikes`, null, {
-      headers: {
-        'Authorization': `Bearer ${PersistentStorage.session.token}`,
-      },
-    });
-
-    if (response.data.success) {
-      setState({
-        ...state,
-        post: Object.assign({}, state.post, response.data.post),
-      });
-
-      if (showComments) {
-        EventEmitter.dispatch('dislike', response.data.post);
-      }
-    }
-  }
-
-  function refreshPage() {
-    setState({
-      ...state,
-      isLastPage: false,
-      isRefreshing: true,
-      nextPage: 1,
-    });
-  }
-
-  function loadNextPage() {
-    setState({
-      ...state,
-      isLoadingNext: true,
-    });
-  }
-
   useEffect(() => {
     const subscribers = [];
 
@@ -147,38 +93,90 @@ function Post({ navigation, post, showAuthor, showComments }) {
 
   useEffect(() => {
     async function loadComments() {
-      if (!state.isLastPage && (state.isLoading || state.isLoadingNext || state.isRefreshing)) {
-        const response = await api.get(`/post/${state.post.id}/comments?page=${state.nextPage}`, {
-          headers: {
-            'Authorization': `Bearer ${PersistentStorage.session.token}`,
-          },
+      const response = await api.get(`/post/${state.post.id}/comments?page=${state.nextPage}`, {
+        headers: {
+          'Authorization': `Bearer ${PersistentStorage.session.token}`,
+        },
+      });
+
+      const comments = (state.isRefreshing ? response.data.comments : [...state.comments, ...response.data.comments])
+        .map(comment => {
+          if (!comment.uuid) {
+            comment.uuid = uuid();
+          }
+
+          return comment;
         });
 
-        const comments = (state.isRefreshing ? response.data.comments : [...state.comments, ...response.data.comments])
-          .map(comment => {
-            if (!comment.uuid) {
-              comment.uuid = uuid();
-            }
-
-            return comment;
-          });
-
-        setState({
-          comments,
-          isLastPage: response.data.isLastPage,
-          isLoading: false,
-          isLoadingNext: false,
-          isRefreshing: false,
-          nextPage: state.nextPage + 1,
-          post: response.data.post,
-        });
-      }
+      setState({
+        comments,
+        isLastPage: response.data.isLastPage,
+        isLoading: false,
+        isLoadingNext: false,
+        isRefreshing: false,
+        nextPage: state.nextPage + 1,
+        post: response.data.post,
+      });
     }
 
-    if (showComments) {
+    if (showComments && (!state.isLastPage && (state.isLoading || state.isLoadingNext || state.isRefreshing))) {
       loadComments();
     }
   }, [state, showComments]);
+
+  async function handleLike() {
+    const response = await api.post(`/post/${state.post.id}/likes`, null, {
+      headers: {
+        'Authorization': `Bearer ${PersistentStorage.session.token}`,
+      },
+    });
+
+    if (response.data.success) {
+      setState({
+        ...state,
+        post: Object.assign({}, state.post, response.data.post),
+      });
+
+      if (showComments) {
+        EventEmitter.dispatch('like', response.data.post);
+      }
+    }
+  }
+
+  async function handleDislike() {
+    const response = await api.post(`/post/${state.post.id}/dislikes`, null, {
+      headers: {
+        'Authorization': `Bearer ${PersistentStorage.session.token}`,
+      },
+    });
+
+    if (response.data.success) {
+      setState({
+        ...state,
+        post: Object.assign({}, state.post, response.data.post),
+      });
+
+      if (showComments) {
+        EventEmitter.dispatch('dislike', response.data.post);
+      }
+    }
+  }
+
+  function refreshPage() {
+    setState({
+      ...state,
+      isLastPage: false,
+      isRefreshing: true,
+      nextPage: 1,
+    });
+  }
+
+  function loadNextPage() {
+    setState({
+      ...state,
+      isLoadingNext: true,
+    });
+  }
 
   const container = (
     <View style={commonStyle.card}>
@@ -275,14 +273,14 @@ function Post({ navigation, post, showAuthor, showComments }) {
               ) : (
                 state.comments.length > 0 ? (
                   state.comments.map(comment => (
-                    <Comment key={comment.uuid} comment={comment} navigation={navigation} />
+                    <Comment key={comment.uuid} navigation={navigation} comment={comment} />
                   ))
                 ) : (
                   <Comment
+                    navigation={navigation}
                     comment={{
                       description: 'There are no comments. Scroll up to refresh the page or create a new comment above.',
                     }}
-                    navigation={navigation}
                   />
                 )
               )
