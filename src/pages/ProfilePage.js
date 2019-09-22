@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import Toast from 'react-native-simple-toast';
 
 import { api } from '../services/api';
+import { EventEmitter } from '../services/EventEmitter';
 import { PersistentStorage } from '../services/PersistentStorage';
 
 import { Page } from './Page';
@@ -23,6 +24,35 @@ function ProfilePage({ navigation }) {
     isLoading: true,
     user: {},
   });
+
+  useEffect(() => {
+    const subscribers = [];
+
+    function updateUser(updatedUser) {
+      if (state.user.id === updatedUser.id) {
+        setState({
+          ...state,
+          user: Object.assign({}, state.user, updatedUser),
+        });
+      }
+    }
+
+    function subscribe() {
+      subscribers.push(
+        EventEmitter.subscribe('edit-user', updateUser),
+      );
+    }
+
+    function unsubscribe() {
+      for (const subscriber of subscribers) {
+        subscriber.unsubscribe();
+      }
+    }
+
+    subscribe();
+
+    return unsubscribe;
+  }, [state]);
 
   useEffect(() => {
     async function loadUser() {

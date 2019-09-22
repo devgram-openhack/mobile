@@ -37,9 +37,25 @@ function TeamPage({ navigation }) {
       }
     }
 
+    function updateMember(updatedMember) {
+      setState({
+        ...state,
+        team: Object.assign({}, state.team, {
+          members: state.team.members.map(member => {
+            if (member.id === updatedMember.id) {
+              member = Object.assign({}, member, updatedMember);
+            }
+
+            return member;
+          }),
+        }),
+      });
+    }
+
     function subscribe() {
       subscribers.push(
         EventEmitter.subscribe('edit-team', updateTeam),
+        EventEmitter.subscribe('edit-user', updateMember),
       );
     }
 
