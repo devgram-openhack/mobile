@@ -21,6 +21,9 @@ function PostForm({ navigation, post }) {
   async function handlePost(values, formikActions) {
     Keyboard.dismiss();
 
+    values.title = values.title.trim();
+    values.description = values.description.trim();
+
     const [method, url] = post.id ? ['patch', `/post/${post.id}`] : ['post', '/posts'];
 
     const response = await api[method](url, values, {
@@ -87,6 +90,7 @@ function PostForm({ navigation, post }) {
               <Text style={commonStyle.formFieldLabel}>Title (*)</Text>
 
               <TextInput
+                autoCapitalize='words'
                 autoCompleteType='off'
                 onChangeText={handleChange('title')}
                 placeholder='The title of your project / idea...'

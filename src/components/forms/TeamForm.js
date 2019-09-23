@@ -17,6 +17,8 @@ function TeamForm({ navigation, team }) {
   async function handleTeam(values, formikActions) {
     Keyboard.dismiss();
 
+    values.name = values.name.trim();
+
     const response = await api.patch(`/team/${team.id}`, values, {
       headers: {
         'Authorization': `Bearer ${PersistentStorage.session.token}`,
@@ -91,6 +93,7 @@ function TeamForm({ navigation, team }) {
               <Text style={commonStyle.formFieldLabel}>Name</Text>
 
               <TextInput
+                autoCapitalize='words'
                 autoCompleteType='off'
                 onChangeText={handleChange('name')}
                 placeholder='MyTeamName'

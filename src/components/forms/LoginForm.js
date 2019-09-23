@@ -14,6 +14,9 @@ function LoginForm({ navigation }) {
   async function handleLogin(values, formikActions) {
     Keyboard.dismiss();
 
+    values.usernameOrEmail = values.usernameOrEmail.trim();
+    values.password = values.password.trim();
+
     const response = await api.post('/login', values);
 
     if (response.data.success) {
@@ -57,7 +60,9 @@ function LoginForm({ navigation }) {
               <Text style={commonStyle.formFieldLabel}>Username or Email (*)</Text>
 
               <TextInput
+                autoCapitalize='none'
                 autoCompleteType='email'
+                autoCorrect={false}
                 autoFocus={true}
                 keyboardType='email-address'
                 onChangeText={handleChange('usernameOrEmail')}
@@ -77,7 +82,9 @@ function LoginForm({ navigation }) {
               <Text style={commonStyle.formFieldLabel}>Password (*)</Text>
 
               <TextInput
+                autoCapitalize='none'
                 autoCompleteType='off'
+                autoCorrect={false}
                 onChangeText={handleChange('password')}
                 placeholder='********'
                 secureTextEntry={true}
