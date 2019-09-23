@@ -14,6 +14,9 @@ function LoginForm({ navigation }) {
   async function handleLogin(values, formikActions) {
     Keyboard.dismiss();
 
+    values.usernameOrEmail = values.usernameOrEmail.trim();
+    values.password = values.password.trim();
+
     const response = await api.post('/login', values);
 
     if (response.data.success) {

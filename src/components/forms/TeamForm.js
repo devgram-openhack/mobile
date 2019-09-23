@@ -17,6 +17,8 @@ function TeamForm({ navigation, team }) {
   async function handleTeam(values, formikActions) {
     Keyboard.dismiss();
 
+    values.name = values.name.trim();
+
     const response = await api.patch(`/team/${team.id}`, values, {
       headers: {
         'Authorization': `Bearer ${PersistentStorage.session.token}`,

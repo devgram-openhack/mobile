@@ -21,6 +21,9 @@ function PostForm({ navigation, post }) {
   async function handlePost(values, formikActions) {
     Keyboard.dismiss();
 
+    values.title = values.title.trim();
+    values.description = values.description.trim();
+
     const [method, url] = post.id ? ['patch', `/post/${post.id}`] : ['post', '/posts'];
 
     const response = await api[method](url, values, {

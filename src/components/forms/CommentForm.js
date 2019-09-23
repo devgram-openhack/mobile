@@ -15,6 +15,8 @@ function CommentForm({ post }) {
   async function handleComment(values, formikActions) {
     Keyboard.dismiss();
 
+    values.description = values.description.trim();
+
     const response = await api.post(`/post/${post.id}/comments`, values, {
       headers: {
         'Authorization': `Bearer ${PersistentStorage.session.token}`,

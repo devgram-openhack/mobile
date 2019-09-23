@@ -21,6 +21,13 @@ function UserForm({ navigation, user }) {
   async function handleUser(values, formikActions) {
     Keyboard.dismiss();
 
+    values.username = values.username.trim();
+    values.name = values.name.trim();
+    values.specialization = values.specialization.trim();
+    values.description = values.description.trim();
+    values.email = values.email.trim();
+    values.password = values.password.trim();
+
     const [method, url] = user.id ? ['patch', '/me'] : ['post', '/register'];
 
     const response = await api[method](url, values, PersistentStorage.session && {
