@@ -6,6 +6,8 @@ An Android / iOS app to improve the experience of everyone involved in hackathon
 
 ## Usage
 
+**WARNING: This app is not ready for production. It does not connect to a database, all of the data in the app is only available during runtime. You will lose all changes made when you re-open the app. This is for testing purposes only, so that you can see how it's supposed to work.**
+
 Download the .apk through the [releases](https://github.com/devgram-openhack/mobile/releases) page.
 
 Deployment for iOS is currently not available as we have no access to a Mac.
